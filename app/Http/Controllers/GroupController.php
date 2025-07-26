@@ -214,6 +214,10 @@ class GroupController extends Controller
             return back()->with('error', __('general.creator_cannot_leave_error'));
         }
 
+        if($group->isContributionStarted()) {
+             return back()->with('error', __('general.contribution_already_started'));
+        }
+
         $membership->delete();
         $group->decrement('current_members');
 

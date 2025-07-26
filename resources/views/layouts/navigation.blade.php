@@ -35,6 +35,9 @@ class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('general.dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('groups.index')" :active="request()->routeIs('groups')">
+                        {{ __('general.groups') }}
+                    </x-nav-link>
                 </div>
             </div>
 

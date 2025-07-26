@@ -314,7 +314,9 @@ return [
     'amount_paid' => 'Amount Paid',
     'status' => 'Status',
     'payment_completed_message' => 'Your payment for this turn has been completed!',
-    'payment_required' => 'Payment Required'
+    'payment_required' => 'Payment Required',
+    'contribution_already_started' => 'Contribution Already Started',
+    'groups' => 'Groups'
 
 
 

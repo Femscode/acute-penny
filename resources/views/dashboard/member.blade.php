@@ -70,7 +70,7 @@
                                             @elseif($payment->is_due_today)
                                                 <span class="text-yellow-600 dark:text-yellow-400 font-medium">{{ __('general.due_today') }}</span>
                                             @else
-                                                <span class="text-blue-600 dark:text-blue-400">{{ __('general.due_in') }} {{ $payment->days_until_due }} {{ __('general.days') }}</span>
+                                                <span class="text-blue-600 dark:text-blue-400">{{ __('general.due_in') }} {{ floor($payment->days_until_due) }} {{ __('general.days') }}</span>
                                             @endif
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('general.due_date') }}: {{ $payment->due_date->format('M d, Y') }}</p>
@@ -240,11 +240,16 @@
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('general.my_groups') }}</h3>
-                        <a href="{{ route('groups.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
-                            {{ __('general.view_all') }}
-                        </a>
-                    </div>
+    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('general.my_groups') }}</h3>
+    <div class="flex space-x-4">
+        <a href="{{ route('groups.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
+            {{ __('general.view_all') }}
+        </a>
+        <a href="{{ route('groups.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-orange hover:bg-brand-orange-900 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
+            {{ __('general.create_group') }}
+        </a>
+    </div>
+</div>
 
                     @if($userGroups->count() > 0 || $createdGroups->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

@@ -32,5 +32,44 @@
                 {{ $slot  }}
             </main>
         </div>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+          <script>
+
+        $(document).ready(function() {
+            @if(session('info'))
+
+            Swal.fire({
+                        icon: 'info',
+                        title: '{{ session("info") }}'
+                        }) 
+            
+        @endif
+        @if (session('message'))
+                Swal.fire({
+                        icon: 'success',
+                        title: '{{ session("message") }}'
+                        }) 
+           
+        @endif
+
+        @if (session('success'))
+                Swal.fire({
+                        icon: 'success',
+                        title: '{{ session("success") }}'
+                        }) 
+           
+        @endif
+
+        @if (session('error'))
+                Swal.fire({
+                        icon: 'error',
+                        title: '{{ session("error") }}'
+                        }) 
+           
+        @endif
+
+        })
+    </script>
     </body>
 </html>
