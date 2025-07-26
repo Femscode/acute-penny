@@ -316,7 +316,9 @@ return [
     'payment_completed_message' => 'Your payment for this turn has been completed!',
     'payment_required' => 'Payment Required',
     'contribution_already_started' => 'Contribution Already Started',
-    'groups' => 'Groups'
+    'groups' => 'Groups',
+    'linear_turn_order' => 'Linear Turn Order',
+    'linear_turn_description' => 'Linear Description'
 
 
 

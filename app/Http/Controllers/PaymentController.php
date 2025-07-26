@@ -47,7 +47,7 @@ class PaymentController extends Controller
     {
        
         $request->validate([
-            'card_number' => 'required|string|min:16|max:19'
+            'card_number' => 'required|string|min:16'
         ]);
 
         try {
