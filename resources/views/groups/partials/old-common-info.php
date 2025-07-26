@@ -2,6 +2,7 @@
 <p class="text-gray-600 dark:text-gray-400 mb-6">{{ $group->description }}</p>
 @endif
 
+
 @if($group->isContributionStarted())
 <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
     <h4 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">{{ __('general.contribution_status') }}</h4>
@@ -56,6 +57,7 @@
             @else
             <a href="{{ route('withdrawal-requests.create', $group) }}"
                 class="inline-flex items-center px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition duration-200">
+
                 Request Payout
             </a>
             @endif
@@ -64,69 +66,48 @@
     @endif
 </div>
 
-@php
-$userHasPaid = $group->hasUserPaidCurrentCycle(Auth::user()->uuid);
-$userContribution = $group->getUserCurrentCycleContribution(Auth::user()->uuid);
-@endphp
 
-@if($userHasPaid)
-<!-- Payment Completed Section -->
+<!-- Current Turn Payout Details -->
+<!-- @if($group->currentTurnUser && $group->currentTurnUser->hasBankDetails())
 <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
-    <div class="flex items-center mb-3">
-        <svg class="w-6 h-6 text-green-600 dark:text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-        </svg>
-        <h4 class="text-lg font-semibold text-green-900 dark:text-green-100">{{ __('general.payment_completed') }}</h4>
-    </div>
+    <h4 class="text-lg font-semibold text-green-900 dark:text-green-100 mb-3">{{ __('general.make_payment_to') }}</h4>
+    <p class="text-sm text-green-700 dark:text-green-300 mb-3">{{ __('general.payment_instructions') }}</p>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-            <div class="text-sm text-green-600 dark:text-green-400">{{ __('general.amount_paid') }}</div>
+            <div class="text-sm text-green-600 dark:text-green-400">{{ __('general.account_name') }}</div>
             <div class="font-semibold text-green-900 dark:text-green-100">
-                ₦{{ number_format($userContribution->amount, 2) }}
+                {{ $group->currentTurnUser->account_name }}
             </div>
         </div>
         <div>
-            <div class="text-sm text-green-600 dark:text-green-400">{{ __('general.payment_date') }}</div>
+            <div class="text-sm text-green-600 dark:text-green-400">{{ __('general.account_number') }}</div>
             <div class="font-semibold text-green-900 dark:text-green-100">
-                {{ $userContribution->paid_at?->format('M d, Y H:i') ?? 'N/A' }}
+                {{ $group->currentTurnUser->account_number }}
             </div>
         </div>
         <div>
-            <div class="text-sm text-green-600 dark:text-green-400">{{ __('general.status') }}</div>
+            <div class="text-sm text-green-600 dark:text-green-400">{{ __('general.bank_name') }}</div>
             <div class="font-semibold text-green-900 dark:text-green-100">
-                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
-                    {{ ucfirst($userContribution->status) }}
-                </span>
+                {{ $group->currentTurnUser->bank_name }}
             </div>
         </div>
-    </div>
-    <div class="mt-3 p-3 bg-green-100 dark:bg-green-900/30 rounded-lg">
-        <p class="text-sm text-green-700 dark:text-green-300">
-            <svg class="w-4 h-4 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-            </svg>
-            {{ __('general.payment_completed_message') }}
-        </p>
     </div>
 </div>
-@else
-<!-- Payment Options Section -->
+@endif -->
+
+<!-- Current Turn Payout Details -->
 @if($group->currentTurnUser)
-<div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4 mb-6">
-    <div class="flex items-center mb-3">
-        <svg class="w-6 h-6 text-orange-600 dark:text-orange-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-        </svg>
-        <h4 class="text-lg font-semibold text-orange-900 dark:text-orange-100">{{ __('general.payment_required') }}</h4>
-    </div>
-    <p class="text-sm text-orange-700 dark:text-orange-300 mb-4">{{ __('general.choose_payment_method') }}</p>
+<div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+    <h4 class="text-lg font-semibold text-green-900 dark:text-green-100 mb-3">{{ __('general.payment_options') }}</h4>
+    <p class="text-sm text-green-700 dark:text-green-300 mb-4">{{ __('general.choose_payment_method') }}</p>
 
     <!-- ALATPay Payment Options -->
     <div class="space-y-4">
         <!-- ALATPay Card Payment -->
-        <div class="border border-orange-300 dark:border-orange-600 rounded-lg p-4">
-            <h5 class="font-semibold text-orange-900 dark:text-orange-100 mb-2">ALATPay - {{ __('general.card_payment') }}</h5>
-            <p class="text-sm text-orange-700 dark:text-orange-300 mb-3">{{ __('general.pay_securely_with_debit_card') }}</p>
+        <!-- ALATPay Card Payment -->
+        <div class="border border-green-300 dark:border-green-600 rounded-lg p-4">
+            <h5 class="font-semibold text-green-900 dark:text-green-100 mb-2">ALATPay - {{ __('general.card_payment') }}</h5>
+            <p class="text-sm text-green-700 dark:text-green-300 mb-3">{{ __('general.pay_securely_with_debit_card') }}</p>
             <a href="{{ route('alat.card.form', $group) }}"
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition inline-block">
                 Pay with Card
@@ -134,9 +115,10 @@ $userContribution = $group->getUserCurrentCycleContribution(Auth::user()->uuid);
         </div>
 
         <!-- ALATPay Bank Transfer -->
-        <div class="border border-orange-300 dark:border-orange-600 rounded-lg p-4">
-            <h5 class="font-semibold text-orange-900 dark:text-orange-100 mb-2">ALATPay - {{ __('general.bank_transfer') }}</h5>
-            <p class="text-sm text-orange-700 dark:text-orange-300 mb-3">{{ __('general.generate_a_virtual_account_for_bank_transfer') }}</p>
+        <!-- ALATPay Bank Transfer -->
+        <div class="border border-green-300 dark:border-green-600 rounded-lg p-4">
+            <h5 class="font-semibold text-green-900 dark:text-green-100 mb-2">ALATPay - {{ __('general.bank_transfer') }}</h5>
+            <p class="text-sm text-green-700 dark:text-green-300 mb-3">{{ __('general.generate_a_virtual_account_for_bank_transfer') }}</p>
             <form action="{{ route('payments.virtual-account', $group->currentContribution ?? $group) }}" method="POST" class="inline">
                 @csrf
                 <input type="hidden" name="amount" value="{{ $group->contribution_amount }}">
@@ -145,9 +127,36 @@ $userContribution = $group->getUserCurrentCycleContribution(Auth::user()->uuid);
                 </button>
             </form>
         </div>
+
+        <!-- Manual Bank Transfer (Fallback) -->
+        <!-- @if($group->currentTurnUser->hasBankDetails())
+        <div class="border border-green-300 dark:border-green-600 rounded-lg p-4">
+            <h5 class="font-semibold text-green-900 dark:text-green-100 mb-2">Manual Bank Transfer</h5>
+            <p class="text-sm text-green-700 dark:text-green-300 mb-3">Transfer directly to recipient's bank account</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                <div>
+                    <div class="text-green-600 dark:text-green-400">{{ __('general.account_name') }}</div>
+                    <div class="font-semibold text-green-900 dark:text-green-100">
+                        {{ $group->currentTurnUser->account_name }}
+                    </div>
+                </div>
+                <div>
+                    <div class="text-green-600 dark:text-green-400">{{ __('general.account_number') }}</div>
+                    <div class="font-semibold text-green-900 dark:text-green-100">
+                        {{ $group->currentTurnUser->account_number }}
+                    </div>
+                </div>
+                <div>
+                    <div class="text-green-600 dark:text-green-400">{{ __('general.bank_name') }}</div>
+                    <div class="font-semibold text-green-900 dark:text-green-100">
+                        {{ $group->currentTurnUser->bank_name }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif -->
     </div>
 </div>
-@endif
 @endif
 @endif
 

@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use App\Services\ContributionService;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class Contribution extends Model
 {
@@ -18,6 +19,9 @@ class Contribution extends Model
         'paid_at',
         'payment_method',
         'notes',
+        'transactionId',
+        'virtual_account_data',
+        'cycle'
     ];
 
     protected $casts = [
@@ -29,7 +33,7 @@ class Contribution extends Model
     protected static function boot()
     {
         parent::boot();
-        
+
         static::creating(function ($contribution) {
             $contribution->uuid = Str::uuid();
         });
@@ -67,11 +71,13 @@ class Contribution extends Model
             'paid_at' => now(),
             'payment_method' => $paymentMethod,
         ]);
+        $contributionService = app(ContributionService::class);
+        $contributionService->checkAndAdvanceTurn($this->group);
     }
 
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'paid' => 'green',
             'overdue' => 'red',
             'pending' => 'yellow',

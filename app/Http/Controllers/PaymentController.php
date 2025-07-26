@@ -130,6 +130,7 @@ class PaymentController extends Controller
             // Store payment reference
             $contribution->update([
                 'payment_reference' => $orderId,
+                'transactionId' => $result['transactionId'],
                 'payment_method' => 'alatpay_card'
             ]);
 
@@ -151,6 +152,7 @@ class PaymentController extends Controller
      */
     public function generateVirtualAccount($contribution)
     {
+       
         $user = Auth::user();
         $contribution = Contribution::where('group_uuid',$contribution)->where('user_uuid',$user->uuid)->first();
        
@@ -166,7 +168,7 @@ class PaymentController extends Controller
                 'metadata' => json_encode(['contribution_id' => $contribution->uuid])
             ];
           
-
+           
             $result = $this->alatPayService->generateVirtualAccount(
                 $contribution->amount,
                 $orderId,
@@ -174,10 +176,14 @@ class PaymentController extends Controller
                 'Contribution Payment for Group: ' . $contribution->group->name
             );
 
+          
+           
+
             if ($result['status']) {
                 // Store payment reference and virtual account details
                 $contribution->update([
                     'payment_reference' => $orderId,
+                    'transactionId' => $result['data']['transactionId'],
                     'payment_method' => 'alatpay_transfer',
                     'virtual_account_data' => json_encode($result['data'])
                 ]);
@@ -191,7 +197,7 @@ class PaymentController extends Controller
 
             throw new Exception('Failed to generate virtual account');
         } catch (Exception $e) {
-           
+           dd($e->getMessage());
             return redirect()->back()->with('error', 'Failed to generate virtual account. Please try again.');
         }
     }
@@ -201,7 +207,7 @@ class PaymentController extends Controller
      */
     public function checkPaymentStatus(Contribution $contribution)
     {
-        if (!$contribution->payment_reference) {
+        if (!$contribution->transactionId) {
             return response()->json([
                 'success' => false,
                 'message' => 'No payment reference found'
@@ -209,8 +215,8 @@ class PaymentController extends Controller
         }
 
         try {
-            $virtualAccountData = json_decode($contribution->virtual_account_data, true);
-            $transactionId = $virtualAccountData['transactionId'] ?? null;
+            // $virtualAccountData = json_decode($contribution->virtual_account_data, true);
+            $transactionId = $contribution['transactionId'] ?? null;
 
             if (!$transactionId) {
                 return response()->json([

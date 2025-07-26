@@ -24,7 +24,7 @@
                         <!-- Start Contribution Section for Admin -->
                         <div class="mb-6 p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
                             <h4 class="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4 text-center">🎯 {{ __('general.start_random_contribution') }}</h4>
-                            <p class="text-sm text-purple-700 dark:text-purple-300 mb-6 text-center">{{ __('general.random_contribution_description') }}</p>
+                            <p class="text-sm text-purple-700 dark:text-purple-300 mb-6 text-center">{{ $group->description }}</p>
                             
                             <div class="flex justify-center">
                                 <form method="POST" action="{{ route('groups.start-contribution', $group->uuid) }}">

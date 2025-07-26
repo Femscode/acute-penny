@@ -80,7 +80,7 @@
 
                                 <div>
                                     <label for="contribution_amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('general.contribution_amount') }}</label>
-                                    <input type="number" id="contribution_amount" name="contribution_amount" value="{{ old('contribution_amount', $group->contribution_amount) }}" min="1000" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100" required>
+                                    <input type="number" id="contribution_amount" name="contribution_amount" value="{{ old('contribution_amount', $group->contribution_amount) }}" min="100" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-100" required>
                                     @error('contribution_amount')
                                         <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                                     @enderror

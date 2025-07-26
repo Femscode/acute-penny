@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Bank Transfer Payment') }}
+            {{ __('general.bank_transfer_payment') }}
         </h2>
     </x-slot>
 
@@ -12,10 +12,10 @@
                     <!-- Payment Instructions -->
                     <div class="mb-8 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
                         <h3 class="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">
-                            {{ __('Transfer Instructions') }}
+                            {{ __('general.transfer_instructions') }}
                         </h3>
                         <p class="text-sm text-green-700 dark:text-green-300">
-                            {{ __('Transfer the exact amount to the account details below. Payment will be confirmed automatically.') }}
+                            {{ __('general.transfer_instructions_details') }}
                         </p>
                     </div>
 
@@ -23,7 +23,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         <div class="space-y-4">
                             <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Account Number') }}</label>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('general.account_number') }}</label>
                                 <div class="flex items-center justify-between">
                                     <span class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $virtualAccount['virtualBankAccountNumber'] }}</span>
                                     <button onclick="copyToClipboard('{{ $virtualAccount['virtualBankAccountNumber'] }}', this)" 
@@ -36,19 +36,19 @@
                             </div>
                             
                             <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Bank Name') }}</label>
-                                <span class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ $virtualAccount['virtualBankCode'] }}</span>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('general.bank_name') }}</label>
+                                <span class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ ($virtualAccount['virtualBankCode']) == '035' ? "Wema Bank" : "--" }}</span>
                             </div>
                         </div>
                         
                         <div class="space-y-4">
                             <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Amount') }}</label>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('general.amount') }}</label>
                                 <span class="text-lg font-bold text-gray-900 dark:text-gray-100">₦{{ number_format($virtualAccount['amount'], 2) }}</span>
                             </div>
                             
                             <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('Expires At') }}</label>
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('general.expires_at') }}</label>
                                 <span class="text-lg font-bold text-red-600 dark:text-red-400">{{ \Carbon\Carbon::parse($virtualAccount['expiredAt'])->format('M d, Y H:i A') }}</span>
                             </div>
                         </div>
@@ -58,26 +58,26 @@
                     <div class="mb-8 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h4 class="text-lg font-semibold text-yellow-900 dark:text-yellow-100">{{ __('Payment Status') }}</h4>
+                                <h4 class="text-lg font-semibold text-yellow-900 dark:text-yellow-100">{{ __('general.payment_status') }}</h4>
                                 <p class="text-sm text-yellow-700 dark:text-yellow-300" id="statusMessage">
-                                    {{ __('Waiting for payment...') }}
+                                    {{ __('general.waiting_for_payment') }}
                                 </p>
                             </div>
                             <button onclick="checkPaymentStatus()" id="checkStatusBtn"
                                 class="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
-                                {{ __('Check Status') }}
+                                {{ __('general.check_status') }}
                             </button>
                         </div>
                     </div>
 
                     <!-- Important Notes -->
                     <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                        <h4 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">{{ __('Important Notes') }}</h4>
+                        <h4 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">{{ __('general.important_notes') }}</h4>
                         <ul class="text-sm text-blue-700 dark:text-blue-300 space-y-1">
-                            <li>• {{ __('Transfer the exact amount shown above') }}</li>
-                            <li>• {{ __('This account is valid for 30 minutes only') }}</li>
-                            <li>• {{ __('Payment confirmation is automatic') }}</li>
-                            <li>• {{ __('Contact support if payment is not confirmed within 1 hour') }}</li>
+                            <li>• {{ __('general.transfer_exact_amount') }}</li>
+                            <li>• {{ __('general.account_validity') }}</li>
+                            <li>• {{ __('general.payment_confirmation') }}</li>
+                            <li>• {{ __('general.contact_support') }}</li>
                         </ul>
                     </div>
 
@@ -85,11 +85,11 @@
                     <div class="flex space-x-4 mt-8">
                         <a href="{{ route('groups.show', $contribution->group) }}" 
                             class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-bold py-3 px-4 rounded-lg text-center transition duration-200">
-                            {{ __('Back to Group') }}
+                            {{ __('general.back_to_group') }}
                         </a>
                         <button onclick="window.print()" 
                             class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200">
-                            {{ __('Print Details') }}
+                            {{ __('general.print_details') }}
                         </button>
                     </div>
                 </div>
@@ -115,7 +115,7 @@
             const button = document.getElementById('checkStatusBtn');
             const statusMessage = document.getElementById('statusMessage');
             
-            button.textContent = 'Checking...';
+            button.textContent = '{{ __('general.checking') }}';
             button.disabled = true;
 
             try {
@@ -131,7 +131,7 @@
                 if (result.success && result.paid) {
                     statusMessage.textContent = result.message;
                     statusMessage.className = 'text-sm text-green-700 dark:text-green-300';
-                    button.textContent = 'Payment Confirmed!';
+                    button.textContent = '{{ __('general.payment_confirmed') }}';
                     button.className = 'bg-green-600 text-white font-bold py-2 px-4 rounded-lg';
                     
                     // Redirect to group page after 3 seconds
@@ -139,13 +139,13 @@
                         window.location.href = '{{ route("groups.show", $contribution->group) }}';
                     }, 3000);
                 } else {
-                    statusMessage.textContent = result.message || 'Payment still pending';
+                    statusMessage.textContent = result.message || '{{ __('general.payment_pending') }}';
                 }
             } catch (error) {
-                statusMessage.textContent = 'Error checking payment status';
+                statusMessage.textContent = '{{ __('general.error_checking_status') }}';
             } finally {
                 if (!button.textContent.includes('Confirmed')) {
-                    button.textContent = 'Check Status';
+                    button.textContent = '{{ __('general.check_status') }}';
                     button.disabled = false;
                 }
             }

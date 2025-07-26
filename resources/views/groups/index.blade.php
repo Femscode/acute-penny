@@ -28,7 +28,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach($userGroups as $group)
                     @php
-                    $userContributions = $group->contributions->where('user_id', Auth::id());
+                     $userContributions = $group->contributions->where('user_uuid', Auth::user()->uuid);
+
                     $totalPaid = $userContributions->where('status', 'paid')->sum('amount');
                     $pendingAmount = $userContributions->where('status', 'pending')->sum('amount');
                     $overdueCount = $userContributions->where('status', 'pending')->filter(function($c) { return $c->due_date->isPast(); })->count();

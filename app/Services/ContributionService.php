@@ -52,6 +52,7 @@ class ContributionService
         if ($group->turn_format === 'random') {
             $positions = range(1, $members->count());
             shuffle($positions);
+            return;
         } else { // linear
             $positions = range(1, $members->count());
         }
@@ -272,6 +273,7 @@ class ContributionService
                 'user_uuid' => $member->user_uuid,
                 'amount' => $group->contribution_amount,
                 'due_date' => $dueDate,
+                'cycle' => $group->current_cycle,
                 'status' => 'pending',
             ]);
         }
@@ -291,6 +293,23 @@ class ContributionService
             default:
                 return $startDate->addWeek();
         }
+    }
+
+    public function checkAndAdvanceTurn(Group $group): bool
+    {
+        // Check if all members have paid for current cycle
+        $totalMembers = $group->current_members;
+        $paidContributions = $group->contributions()
+            ->where('cycle', $group->current_cycle)
+            ->where('status', 'paid')
+            ->count();
+
+        if ($paidContributions >= $totalMembers) {
+            $this->advanceToNextTurn($group);
+            return true;
+        }
+
+        return false;
     }
 
     public function advanceToNextTurn(Group $group): void
@@ -320,6 +339,7 @@ class ContributionService
                 'user_uuid' => $member->user_uuid,
                 'amount' => $group->contribution_amount,
                 'due_date' => $dueDate,
+                'cycle' => $group->current_cycle,
                 'status' => 'pending',
             ]);
         }

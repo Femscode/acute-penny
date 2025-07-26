@@ -102,9 +102,14 @@ class DashboardController extends Controller
             ->orderBy('due_date', 'asc')
             ->get()
             ->map(function ($contribution) use ($now) {
-                $contribution->is_overdue = $contribution->due_date->isPast();
+                $contribution->is_overdue = $contribution->due_date->isPast() && !$contribution->due_date->isToday();
                 $contribution->is_due_today = $contribution->due_date->isToday();
-                $contribution->days_until_due = $contribution->due_date->diffInDays($now, false);
+
+                // Always return positive days (for display purposes)
+                $contribution->days_until_due = $contribution->due_date->isPast()
+                    ? $contribution->due_date->diffInDays($now) // past (overdue)
+                    : $now->diffInDays($contribution->due_date); // future (due in X days)
+
                 return $contribution;
             });
     }

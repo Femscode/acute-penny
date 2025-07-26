@@ -66,7 +66,7 @@
                                         <p class="text-sm text-gray-600 dark:text-gray-400">
                                             ₦{{ number_format($payment->amount, 2) }} • 
                                             @if($payment->is_overdue)
-                                                <span class="text-red-600 dark:text-red-400 font-medium">{{ __('general.overdue') }} ({{ abs($payment->days_until_due) }} {{ __('general.days_ago') }})</span>
+                                                <span class="text-red-600 dark:text-red-400 font-medium">{{ __('general.overdue') }} ({{ floor($payment->days_until_due) }} {{ __('general.days_ago') }})</span>
                                             @elseif($payment->is_due_today)
                                                 <span class="text-yellow-600 dark:text-yellow-400 font-medium">{{ __('general.due_today') }}</span>
                                             @else
@@ -170,16 +170,13 @@
             </div>
 
           
-// ... existing code ...
 
 @if($payoutEligibleGroups->count() > 0)
 <!-- Payout Eligible Groups -->
 <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
     <div class="p-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-            <svg class="w-6 h-6 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-            </svg>
+           
             {{ __('Payout Available') }}
         </h3>
         
@@ -219,7 +216,6 @@
 </div>
 @endif
 
-// ... existing code ...
 <!-- Add this section before the "My Groups" section -->
 @if($pendingGroups->count() > 0)
 <div class="bg-white rounded-lg shadow-md p-6 mb-6">

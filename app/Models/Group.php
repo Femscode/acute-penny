@@ -145,4 +145,58 @@ class Group extends Model
     {
         return $this->privacy_type === 'public';
     }
+ 
+    /**
+     * Check if a user has paid their contribution for the current cycle
+     */
+    public function hasUserPaidCurrentCycle($userUuid): bool
+    {
+        if (!$this->isContributionStarted()) {
+            return false;
+        }
+
+        // Get the current cycle's due date
+        $currentCycleDueDate = $this->getNextContributionDate();
+        
+        if (!$currentCycleDueDate) {
+            return false;
+        }
+
+      
+        $contri = Contribution::where('group_uuid',$this->uuid);
+       
+        // Check if user has a paid contribution for the current cycle
+        return $contri
+            ->where('user_uuid', $userUuid)
+            // ->where('due_date','>=', $currentCycleDueDate->toDateString())
+              ->where('cycle', $this->current_cycle)
+            ->where('status', 'paid')
+            ->exists();
+    }
+
+    /**
+     * Get user's contribution status for current cycle
+     */
+    public function getUserCurrentCycleContribution($userUuid)
+    {
+        if (!$this->isContributionStarted()) {
+            return null;
+        }
+
+        $currentCycleDueDate = $this->getNextContributionDate();
+        
+        if (!$currentCycleDueDate) {
+            return null;
+        }
+
+         $contri = Contribution::where('group_uuid',$this->uuid);
+        return $contri
+            ->where('user_uuid', $userUuid)
+              ->where('cycle', $this->current_cycle)
+            // ->where('due_date', '>=', $currentCycleDueDate->toDateString())
+            ->first();
+    }
+
+  
+
 }

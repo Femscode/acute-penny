@@ -65,7 +65,7 @@ class GroupController extends Controller
             'group_uuid' => $group->uuid,
             'user_uuid' => Auth::user()->uuid,
             'joined_at' => now(),
-            'payout_position' => 1,
+            // 'payout_position' => 1,
         ]);
 
         $group->increment('current_members');
@@ -191,7 +191,7 @@ class GroupController extends Controller
             'group_uuid' => $group->uuid,
             'user_uuid' => Auth::user()->uuid,
             'joined_at' => now(),
-            'payout_position' => $group->current_members + 1,
+            // 'payout_position' => $group->current_members + 1,
         ]);
 
         $group->increment('current_members');
@@ -283,7 +283,7 @@ class GroupController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
-            'contribution_amount' => 'required|numeric|min:1000',
+            'contribution_amount' => 'required|numeric|min:100',
             'frequency' => 'required|in:daily,weekly,monthly',
             'turn_format' => 'required|in:random,linear,manual',
             'privacy_type' => 'required|in:public,private',

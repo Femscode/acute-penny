@@ -21,6 +21,8 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->enum('status', ['pending', 'paid', 'overdue'])->default('pending');
             $table->date('due_date');
+            $table->integer('cycle')->nullable();
+            $table->string('transactionId')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->string('payment_method')->nullable();
             $table->text('notes')->nullable();
