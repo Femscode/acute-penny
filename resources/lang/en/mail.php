@@ -40,4 +40,8 @@ return [
 'you_left_group_subject' => 'You have left :group_name',
 'you_joined_group_message' => 'You have successfully joined the group.',
 'you_left_group_message' => 'You have successfully left the group.',
+// Add these to your existing mail.php file
+'group_membership_title' => 'Group Membership Update',
+'group_left_note' => 'Thank you for being part of our community.',
+'view_group' => 'View Group',
 ];
