@@ -4,6 +4,10 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+
+    <meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @if(isset($show_info) && $show_info)
     <meta name="title" content="Become part of our savings circle">

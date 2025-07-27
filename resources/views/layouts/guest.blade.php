@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    <meta property="og:locale" content="en_US" />
+	<meta property="og:type" content="article" />
     <title>{{ config('app.name', 'Synco Save') }}</title>
     @if(isset($show_info) && $show_info)
     <meta name="title" content="Become part of our savings circle">
