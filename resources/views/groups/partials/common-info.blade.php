@@ -63,7 +63,7 @@
         </div>
     </div>
     @endif
-    @endif
+    
 </div>
 
 @php
@@ -151,6 +151,7 @@ $userContribution = $group->getUserCurrentCycleContribution(Auth::user()->uuid);
         </div>
     </div>
 </div>
+@endif
 @endif
 @endif
 @endif
