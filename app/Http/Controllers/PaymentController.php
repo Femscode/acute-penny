@@ -69,7 +69,7 @@ class PaymentController extends Controller
                 ], 400);
             }
         } catch (Exception $e) {
-            dd($e->getMessage());
+           
             return response()->json([
                 'success' => false,
                 'message' => 'Payment initialization failed. Please try again.'

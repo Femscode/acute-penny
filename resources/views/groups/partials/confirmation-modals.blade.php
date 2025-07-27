@@ -1,4 +1,4 @@
-@if($canJoin)
+@if($isAuthenticated && $canJoin)
 <x-confirmation-modal
     name="join-group-{{ $group->id }}"
     :title="__('general.confirm_join_group')"
@@ -9,7 +9,7 @@
     x-on:confirm-action="if ($event.detail === 'join-group-{{ $group->id }}') { document.getElementById('join-form-{{ $group->id }}').submit(); }" />
 @endif
 
-@if($userIsMember && $group->created_by !== auth()->user()->uuid && $group->current_members > 1)
+@if($isAuthenticated && $userIsMember && $group->created_by !== auth()->user()->uuid && $group->current_members > 1)
 <x-confirmation-modal
     name="leave-group-{{ $group->id }}"
     :title="__('general.confirm_leave_group')"

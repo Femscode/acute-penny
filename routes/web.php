@@ -3,6 +3,7 @@
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LanguageController;
+use App\Http\Controllers\MailProcessingController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WithdrawalRequestController;
@@ -12,10 +13,14 @@ use Illuminate\Support\Facades\Route;
 
 
 
+
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Add this route for cron job mail processing
+Route::any('/process-mails', [MailProcessingController::class, 'processPendingMails'])
+    ->name('mails.process');
 
 Route::get('/language/{locale}', [App\Http\Controllers\LanguageController::class, 'changeLanguage'])
     ->name('language.change')
@@ -41,7 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
     Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
     Route::get('/groups/browse', [GroupController::class, 'browse'])->name('groups.browse');
-    Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
+
     Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
     Route::delete('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
 
@@ -79,5 +84,5 @@ Route::middleware('auth')->group(function () {
 // ALATPay webhook (no auth required)
 Route::post('/alatpay/callback', [PaymentController::class, 'handleCallback'])->name('payments.callback');
 
-
+Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
 require __DIR__ . '/auth.php';

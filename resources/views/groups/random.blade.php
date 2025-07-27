@@ -1,102 +1,126 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-                {{ $group->name }}
-            </h2>
-            <span class="px-3 py-1 text-sm font-medium bg-{{ $group->status === 'open' ? 'green' : 'blue' }}-100 text-{{ $group->status === 'open' ? 'green' : 'blue' }}-800 dark:bg-{{ $group->status === 'open' ? 'green' : 'blue' }}-900 dark:text-{{ $group->status === 'open' ? 'green' : 'blue' }}-200 rounded-full">
+@if($isAuthenticated)
+    <x-app-layout>
+        <x-slot name="header">
+            <div class="flex items-center justify-between">
+                <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                    {{ $group->name }}
+                </h2>
+                <span class="px-3 py-1 text-sm font-medium bg-{{ $group->status === 'open' ? 'green' : 'blue' }}-100 text-{{ $group->status === 'open' ? 'green' : 'blue' }}-800 dark:bg-{{ $group->status === 'open' ? 'green' : 'blue' }}-900 dark:text-{{ $group->status === 'open' ? 'green' : 'blue' }}-200 rounded-full">
+                    {{ ucfirst($group->status) }}
+                </span>
+            </div>
+        </x-slot>
+
+        @include('groups.partials.confirmation-modals')
+
+        <div class="py-12">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+                <!-- Group Information -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
+                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('general.group_information') }}</h3>
+
+                            @if($group->created_by === Auth::user()->uuid && $group->canStartContribution())
+                                <!-- Start Contribution Section for Admin -->
+                                <div class="mb-6 p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                                    <h4 class="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4 text-center">🎯 {{ __('general.start_random_contribution') }}</h4>
+                                    <p class="text-sm text-purple-700 dark:text-purple-300 mb-6 text-center">{{ $group->description }}</p>
+                                    
+                                    <div class="flex justify-center">
+                                        <form method="POST" action="{{ route('groups.start-contribution', $group->uuid) }}">
+                                            @csrf
+                                            <button type="submit"
+                                                class="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
+                                                onclick="return confirm('{{ __('general.confirm_start_contribution') }}')">
+                                                🚀 {{ __('general.start_contribution') }}
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if($group->isContributionStarted())
+                                @php
+                                    $currentUserMember = $group->members()->where('user_uuid', Auth::user()->uuid)->first();
+                                @endphp
+
+                                @if($currentUserMember && !$currentUserMember->is_rolled)
+                                    <!-- Spin Wheel Section for Members to Discover Position -->
+                                    <div class="mb-6 p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+                                        <h4 class="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4 text-center">🎲 {{ __('general.discover_your_turn') }}</h4>
+                                        <p class="text-sm text-purple-700 dark:text-purple-300 mb-6 text-center">{{ __('general.spin_to_discover_position') }}</p>
+                                        
+                                        <div class="flex flex-col items-center space-y-6">
+                                            <div class="relative">
+                                                <!-- Wheel -->
+                                                <div id="member-spin-wheel" class="rounded-full border-8 border-gray-300 dark:border-gray-600 relative overflow-hidden shadow-2xl transition-transform duration-4000 ease-out">
+                                                    <!-- Wheel segments will be generated by JavaScript -->
+                                                </div>
+                                                
+                                                <!-- Pointer -->
+                                                <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
+                                                    <div class="w-0 h-0 border-l-4 border-r-4 border-b-8 border-l-transparent border-r-transparent border-b-red-600"></div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Member Spin Button -->
+                                            <button id="member-spin-btn" type="button"
+                                                class="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
+                                                🎲 {{ __('general.discover_my_position') }}
+                                            </button>
+                                            
+                                            <!-- Member Result Display -->
+                                            <div id="member-spin-result" class="hidden mt-6 p-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg text-center">
+                                                <h5 class="text-lg font-bold text-green-800 dark:text-green-200 mb-2">🎉 {{ __('general.your_position') }}</h5>
+                                                <p id="member-result-text" class="text-green-700 dark:text-green-300"></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @elseif($currentUserMember && $currentUserMember->is_rolled)
+                                    <!-- Position Already Revealed -->
+                                    <div class="mb-6 p-6 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
+                                        <div class="text-center">
+                                            <h4 class="text-lg font-bold text-green-800 dark:text-green-200 mb-2">✅ {{ __('general.position_revealed') }}</h4>
+                                            <p class="text-green-700 dark:text-green-300">{{ __('general.your_turn_position', ['position' => $currentUserMember->payout_position]) }}</p>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
+                        </div>
+
+                        @include('groups.partials.common-info')
+                        @include('groups.partials.action-buttons')
+                    </div>
+                </div>
+
+                @include('groups.partials.members-list')
+            </div>
+        </div>
+
+        @include('groups.partials.random-scripts')
+    </x-app-layout>
+@else
+    <x-guest-layout>
+        <!-- Guest header -->
+        <div class="mb-6 text-center">
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ $group->name }}</h1>
+            <span class="inline-block px-3 py-1 text-sm font-medium bg-{{ $group->status === 'open' ? 'green' : 'blue' }}-100 text-{{ $group->status === 'open' ? 'green' : 'blue' }}-800 dark:bg-{{ $group->status === 'open' ? 'green' : 'blue' }}-900 dark:text-{{ $group->status === 'open' ? 'green' : 'blue' }}-200 rounded-full">
                 {{ ucfirst($group->status) }}
             </span>
+            <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">{{ __('general.random_turn_format') }}</p>
         </div>
-    </x-slot>
 
-    @include('groups.partials.confirmation-modals')
-
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <!-- Group Information -->
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6">
-                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('general.group_information') }}</h3>
-
-                        @if($group->created_by === Auth::user()->uuid && $group->canStartContribution())
-                        <!-- Start Contribution Section for Admin -->
-                        <div class="mb-6 p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                            <h4 class="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4 text-center">🎯 {{ __('general.start_random_contribution') }}</h4>
-                            <p class="text-sm text-purple-700 dark:text-purple-300 mb-6 text-center">{{ $group->description }}</p>
-                            
-                            <div class="flex justify-center">
-                                <form method="POST" action="{{ route('groups.start-contribution', $group->uuid) }}">
-                                    @csrf
-                                    <button type="submit"
-                                        class="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200"
-                                        onclick="return confirm('{{ __('general.confirm_start_contribution') }}')">
-                                        🚀 {{ __('general.start_contribution') }}
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                        @endif
-
-                        @if($group->isContributionStarted())
-                        @php
-                            $currentUserMember = $group->members()->where('user_uuid', Auth::user()->uuid)->first();
-                        @endphp
-                        
-                        @if($currentUserMember && !$currentUserMember->is_rolled)
-                        <!-- Spin Wheel Section for Members to Discover Position -->
-                        <div class="mb-6 p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
-                            <h4 class="text-xl font-bold text-purple-900 dark:text-purple-100 mb-4 text-center">🎲 {{ __('general.discover_your_turn') }}</h4>
-                            <p class="text-sm text-purple-700 dark:text-purple-300 mb-6 text-center">{{ __('general.spin_to_discover_position') }}</p>
-                            
-                            <!-- Member Wheel Container -->
-                            <div class="flex flex-col items-center space-y-6">
-                                <div class="relative">
-                                    <!-- Wheel -->
-                                    <div id="member-spin-wheel" class="rounded-full border-8 border-gray-300 dark:border-gray-600 relative overflow-hidden shadow-2xl transition-transform duration-4000 ease-out">
-                                        <!-- Wheel segments will be generated by JavaScript -->
-                                    </div>
-                                    
-                                    <!-- Pointer -->
-                                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 z-10">
-                                        <div class="w-0 h-0 border-l-4 border-r-4 border-b-8 border-l-transparent border-r-transparent border-b-red-600"></div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Member Spin Button -->
-                                <button id="member-spin-btn" type="button"
-                                    class="px-8 py-4 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold rounded-full shadow-lg transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none">
-                                    🎲 {{ __('general.discover_my_position') }}
-                                </button>
-                                
-                                <!-- Member Result Display -->
-                                <div id="member-spin-result" class="hidden mt-6 p-4 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg text-center">
-                                    <h5 class="text-lg font-bold text-green-800 dark:text-green-200 mb-2">🎉 {{ __('general.your_position') }}</h5>
-                                    <p id="member-result-text" class="text-green-700 dark:text-green-300"></p>
-                                </div>
-                            </div>
-                        </div>
-                        @elseif($currentUserMember && $currentUserMember->is_rolled)
-                        <!-- Position Already Revealed -->
-                        <div class="mb-6 p-6 bg-green-100 dark:bg-green-900/30 border border-green-300 dark:border-green-700 rounded-lg">
-                            <div class="text-center">
-                                <h4 class="text-lg font-bold text-green-800 dark:text-green-200 mb-2">✅ {{ __('general.position_revealed') }}</h4>
-                                <p class="text-green-700 dark:text-green-300">{{ __('general.your_turn_position', ['position' => $currentUserMember->payout_position]) }}</p>
-                            </div>
-                        </div>
-                        @endif
-                        @endif
+        <div class="py-6">
+            <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+                <!-- Group Information -->
+                <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                    <div class="p-6">
+                        @include('groups.partials.common-info')
+                        @include('groups.partials.action-buttons')
                     </div>
-
-                    @include('groups.partials.common-info')
-                    @include('groups.partials.action-buttons')
                 </div>
             </div>
-
-            @include('groups.partials.members-list')
         </div>
-    </div>
-
-    @include('groups.partials.random-scripts')
-</x-app-layout>
+    </x-guest-layout>
+@endif

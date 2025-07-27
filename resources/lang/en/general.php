@@ -318,7 +318,15 @@ return [
     'contribution_already_started' => 'Contribution Already Started',
     'groups' => 'Groups',
     'linear_turn_order' => 'Linear Turn Order',
-    'linear_turn_description' => 'Linear Description'
+    'linear_turn_description' => 'Linear Description',
+    'payment_option_not_available' => 'Payment Option Not Available',
+    'linear_turn_format' => 'Linearly Assigned Turn Format',
+    'login' => 'Login',
+    'signup_to_join_group' => 'Sign Up to Join Group',
+    'random_turn_format' => 'Randomly Assigned Turn Format',
+    'manual_turn_format' => 'Manually Assigned Turn Format',
+    'register' => 'Register'
+
 
 
 

@@ -25,9 +25,9 @@
                   document.documentElement.classList.remove('dark');
               }
           ">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-100 dark:bg-gray-900">
+        <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             <!-- Theme Toggle for Guest Pages -->
-            <div class="absolute top-4 right-4">
+            <div class="absolute top-4 right-4 z-50">
                 <button
                     @click="
                         darkMode = !darkMode;
@@ -48,7 +48,28 @@
                 </button>
             </div>
 
-            <div class="w-full sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-4xl mt-6 px-6 py-4 bg-white dark:bg-gray-800 shadow-md overflow-hidden sm:rounded-lg">
+            <!-- Navigation for guests -->
+            <nav class="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between h-16">
+                        <div class="flex items-center">
+                            <a href="{{ route('login') }}" class="text-xl font-bold text-gray-800 dark:text-gray-200">
+                                {{ config('app.name', 'Laravel') }}
+                            </a>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <a href="{{ route('login') }}" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                                {{ __('general.login') }}
+                            </a>
+                            <a href="{{ route('register') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium">
+                                {{ __('general.register') }}
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="w-full max-w-7xl mx-auto mt-6 px-6 py-4">
                 {{ $slot }}
             </div>
         </div>

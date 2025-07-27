@@ -1,4 +1,9 @@
+@if($isAuthenticated)
 <x-app-layout>
+@else
+<x-guest-layout>
+@endif
+    @if($isAuthenticated)
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -9,8 +14,17 @@
             </span>
         </div>
     </x-slot>
+    @else
 
-    @if($canJoin)
+     <div class="mb-6 text-center">
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{{ $group->name }}</h1>
+        <span class="inline-block px-3 py-1 text-sm font-medium bg-{{ $group->status === 'open' ? 'green' : 'blue' }}-100 text-{{ $group->status === 'open' ? 'green' : 'blue' }}-800 dark:bg-{{ $group->status === 'open' ? 'green' : 'blue' }}-900 dark:text-{{ $group->status === 'open' ? 'green' : 'blue' }}-200 rounded-full">
+            {{ ucfirst($group->status) }}
+        </span>
+    </div>
+    @endif
+
+     @if($isAuthenticated && $canJoin)
     <x-confirmation-modal
         name="join-group-{{ $group->id }}"
         :title="__('general.confirm_join_group')"
@@ -21,7 +35,7 @@
         x-on:confirm-action="if ($event.detail === 'join-group-{{ $group->id }}') { document.getElementById('join-form-{{ $group->id }}').submit(); }" />
     @endif
 
-    @if($userIsMember && $group->created_by !== auth()->user()->uuid && $group->current_members > 1)
+     @if($isAuthenticated && $userIsMember && $group->created_by !== auth()->user()->uuid && $group->current_members > 1)
     <x-confirmation-modal
         name="leave-group-{{ $group->id }}"
         :title="__('general.confirm_leave_group')"
@@ -32,7 +46,7 @@
         x-on:confirm-action="if ($event.detail === 'leave-group-{{ $group->id }}') { document.getElementById('leave-form-{{ $group->id }}').submit(); }" />
     @endif
 
-    <div class="py-12">
+   <div class="{{ $isAuthenticated ? 'py-12' : 'py-6' }}">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             <!-- Group Information -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
@@ -40,8 +54,7 @@
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-4">
                         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('general.group_information') }}</h3>
                         
-
-                        @if($group->created_by === Auth::user()->uuid && $group->canStartContribution())
+                        @if($isAuthenticated && $group->created_by === Auth::user()->uuid && $group->canStartContribution())
                         @if($group->turn_format === 'random')
                         <!-- Spin Wheel Section for Random Turn Assignment -->
                         <div class="mb-6 p-6 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
@@ -141,7 +154,7 @@
                         @endif
                     </div>
 
-                    @if($group->created_by === Auth::user()->uuid && $group->canStartContribution() && $group->turn_format === 'manual')
+                    @if($isAuthenticated && $group->created_by === Auth::user()->uuid && $group->canStartContribution() && $group->turn_format === 'manual')
                     <!-- Manual Position Assignment Section -->
                     <div class="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
                         <h4 class="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-3">{{ __('general.position_assignment') }}</h4>
@@ -180,7 +193,7 @@
                     <p class="text-gray-600 dark:text-gray-400 mb-6">{{ $group->description }}</p>
                     @endif
 
-                    @if($group->isContributionStarted())
+                     @if($isAuthenticated && $group->isContributionStarted())
                     <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
                         <h4 class="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-3">{{ __('general.contribution_status') }}</h4>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -479,6 +492,8 @@
             document.body.removeChild(textarea);
         }
     </script>
+
+    @if($isAuthenticated)
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const memberPositions = document.getElementById('member-positions');
@@ -756,4 +771,10 @@
 
     <!-- Include SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    @endif
+
+@if($isAuthenticated)
 </x-app-layout>
+@else
+</x-guest-layout>
+@endif

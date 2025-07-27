@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Group;
 use App\Models\GroupMember;
 use App\Services\ContributionService;
+use App\Services\NotificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -74,7 +75,7 @@ class GroupController extends Controller
             ->with('success', __('general.group_created_success'));
     }
 
-    public function startContribution(Group $group): RedirectResponse
+    public function startContribution(Group $group, NotificationService $notificationService): RedirectResponse
     {
         $user = Auth::user();
         // Check if user is the group creator
@@ -89,6 +90,7 @@ class GroupController extends Controller
 
         // Start the contribution
         if ($this->contributionService->startContribution($group)) {
+            $notificationService->queueContributionStartedMails($group);
             return back()->with('success', __('general.contribution_started_success'));
         }
 
@@ -147,11 +149,18 @@ class GroupController extends Controller
         return view('groups.browse', compact('groups'));
     }
 
-    public function show(Group $group): View
+    public function oldshow(Group $group): View
     {
         $group->load(['creator', 'members.user', 'contributions']);
-        $userIsMember = $group->hasMember(Auth::user()->uuid);
-        $canJoin = !$userIsMember && !$group->isFull() && $group->status === 'open';
+        if (Auth::user()) {
+            $userIsMember = $group->hasMember(Auth::user()->uuid);
+            $canJoin = !$userIsMember && !$group->isFull() && $group->status === 'open';
+        } else {
+            $userIsMember = null;
+            $canJoin = true;
+        }
+
+
 
         $viewName = match ($group->turn_format) {
             'random' => 'groups.random',
@@ -163,7 +172,31 @@ class GroupController extends Controller
         return view($viewName, compact('group', 'userIsMember', 'canJoin'));
     }
 
-    public function join(Group $group): RedirectResponse
+    public function show(Group $group): View
+    {
+        $group->load(['creator', 'members.user', 'contributions']);
+
+        // Check if user is authenticated
+        if (Auth::check()) {
+            $userIsMember = $group->hasMember(Auth::user()->uuid);
+            $canJoin = !$userIsMember && !$group->isFull() && $group->status === 'open';
+            $isAuthenticated = true;
+        } else {
+            $userIsMember = false;
+            $canJoin = false; // Unauthenticated users can't join directly
+            $isAuthenticated = false;
+        }
+
+        $viewName = match ($group->turn_format) {
+            'random' => 'groups.random',
+            'linear' => 'groups.linear',
+            'manual' => 'groups.manual',
+            default => 'groups.show'
+        };
+        return view($viewName, compact('group', 'userIsMember', 'canJoin', 'isAuthenticated'));
+    }
+
+    public function join(Group $group, NotificationService $notificationService): RedirectResponse
     {
 
         if ($group->isFull()) {
@@ -195,12 +228,12 @@ class GroupController extends Controller
         ]);
 
         $group->increment('current_members');
-
+        $notificationService->queueGroupMembershipMail(Auth::user(), $group, 'joined');
         return redirect()->route('groups.show', $group->uuid)
             ->with('success', __('general.joined_group_success'));
     }
 
-    public function leave(Group $group): RedirectResponse
+    public function leave(Group $group,  NotificationService $notificationService): RedirectResponse
     {
         $membership = GroupMember::where('group_uuid', $group->uuid)
             ->where('user_uuid', Auth::user()->uuid)
@@ -214,13 +247,13 @@ class GroupController extends Controller
             return back()->with('error', __('general.creator_cannot_leave_error'));
         }
 
-        if($group->isContributionStarted()) {
-             return back()->with('error', __('general.contribution_already_started'));
+        if ($group->isContributionStarted()) {
+            return back()->with('error', __('general.contribution_already_started'));
         }
 
         $membership->delete();
         $group->decrement('current_members');
-
+        $notificationService->queueGroupMembershipMail(Auth::user(), $group, 'left');
         return redirect()->route('dashboard')
             ->with('success', __('general.left_group_success'));
     }
@@ -255,7 +288,7 @@ class GroupController extends Controller
 
     // ... existing code ...
 
-    public function settings(Group $group): RedirectResponse|View      
+    public function settings(Group $group): RedirectResponse|View
     {
         // Check if user is the group creator
         if ($group->created_by !== Auth::user()->uuid) {
@@ -366,7 +399,7 @@ class GroupController extends Controller
             return back()->with('error', __('general.member_not_found'));
         }
 
-         
+
         // $membership->update(['status' => 'rejected']);
         $membership->delete();
 
