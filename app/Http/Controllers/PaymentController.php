@@ -27,7 +27,7 @@ class PaymentController extends Controller
     public function showPaymentOptions(Contribution $contribution)
     {
         $user = Auth::user();
-        
+
         // Ensure user can pay this contribution
         if ($contribution->user_uuid !== $user->uuid) {
             abort(403, 'Unauthorized');
@@ -45,7 +45,7 @@ class PaymentController extends Controller
      */
     public function initializeCardPayment(Request $request, Contribution $contribution)
     {
-       
+
         $request->validate([
             'card_number' => 'required|string|min:16'
         ]);
@@ -69,7 +69,7 @@ class PaymentController extends Controller
                 ], 400);
             }
         } catch (Exception $e) {
-           
+
             return response()->json([
                 'success' => false,
                 'message' => 'Payment initialization failed. Please try again.'
@@ -77,7 +77,7 @@ class PaymentController extends Controller
         }
     }
 
-        public function showCardForm(Group $group)
+    public function showCardForm(Group $group)
     {
         // Ensure the group has a current turn user
         if (!$group->currentTurnUser) {
@@ -92,7 +92,7 @@ class PaymentController extends Controller
      */
     public function processCardPayment(Request $request, $contribution)
     {
-       
+
         $request->validate([
             'card_number' => 'required|string',
             'card_month' => 'required|string|size:2',
@@ -153,13 +153,13 @@ class PaymentController extends Controller
      */
     public function generateVirtualAccount($contribution)
     {
-       
+
         $user = Auth::user();
-        $contribution = Contribution::where('group_uuid',$contribution)->where('user_uuid',$user->uuid)->first();
-       
+        $contribution = Contribution::where('group_uuid', $contribution)->where('user_uuid', $user->uuid)->first();
+
         $orderId = 'CONTRIB_BANK_' . $contribution->uuid;
-       
-       
+
+
         try {
             $customer = [
                 'email' => $user->email,
@@ -168,8 +168,8 @@ class PaymentController extends Controller
                 'lastName' => explode(' ', $user->name)[1] ?? 'Fasanya',
                 'metadata' => json_encode(['contribution_id' => $contribution->uuid])
             ];
-          
-           
+
+
             $result = $this->alatPayService->generateVirtualAccount(
                 $contribution->amount,
                 $orderId,
@@ -177,8 +177,8 @@ class PaymentController extends Controller
                 'Contribution Payment for Group: ' . $contribution->group->name
             );
 
-          
-           
+
+
 
             if ($result['status']) {
                 // Store payment reference and virtual account details
@@ -194,11 +194,11 @@ class PaymentController extends Controller
                     'virtualAccount' => $result['data']
                 ]);
             }
-          
+
 
             throw new Exception('Failed to generate virtual account');
         } catch (Exception $e) {
-           dd($e->getMessage());
+            dd($e->getMessage());
             return redirect()->back()->with('error', 'Failed to generate virtual account. Please try again.');
         }
     }
@@ -230,11 +230,16 @@ class PaymentController extends Controller
 
             if ($result['status'] && isset($result['data']['status'])) {
                 $paymentStatus = $result['data']['status'];
-                
+
                 if (strtolower($paymentStatus) === 'successful' || strtolower($paymentStatus) === 'completed') {
                     // Mark contribution as paid
                     $contribution->markAsPaid('alatpay_transfer');
-                    
+                    $notificationService = app(\App\Services\NotificationService::class);
+                    $notificationService->queuePaymentSuccessMail(
+                        $contribution->user,
+                        $contribution->group,
+                        $contribution
+                    );
                     return response()->json([
                         'success' => true,
                         'paid' => true,
@@ -266,16 +271,16 @@ class PaymentController extends Controller
 
         try {
             $data = $request->all();
-            
+
             // Find contribution by order ID or transaction reference
             $orderId = $data['orderId'] ?? $data['reference'] ?? null;
-            
+
             if (!$orderId) {
                 return response()->json(['message' => 'Order ID not found'], 400);
             }
 
             $contribution = Contribution::where('payment_reference', $orderId)->first();
-            
+
             if (!$contribution) {
                 return response()->json(['message' => 'Contribution not found'], 404);
             }

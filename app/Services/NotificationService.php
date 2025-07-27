@@ -12,7 +12,7 @@ class NotificationService
     public function queueWelcomeMail(User $user): void
     {
         $language = $user->preferred_language ?? 'en';
-        
+
         MailNotification::create([
             'user_uuid' => $user->uuid,
             'mail_type' => 'welcome',
@@ -30,11 +30,11 @@ class NotificationService
     {
         $language = $user->preferred_language ?? 'en';
         $subjectKey = $action === 'joined' ? 'mail.member_joined_subject' : 'mail.member_left_subject';
-        
+
         // Notify all other group members
         $group->members()->where('user_uuid', '!=', $user->uuid)->each(function ($member) use ($user, $group, $action, $subjectKey) {
             $memberLanguage = $member->user->preferred_language ?? 'en';
-            
+
             MailNotification::create([
                 'user_uuid' => $member->user_uuid,
                 'mail_type' => 'group_membership',
@@ -51,62 +51,109 @@ class NotificationService
         });
     }
 
-  public function queueGroupMembershipMail(User $user, Group $group, string $action): void
-{
-    $language = $user->preferred_language ?? 'en';
-    $subjectKey = $action === 'joined' ? 'mail.member_joined_subject' : 'mail.member_left_subject';
-    
-    // Send confirmation email to the user who performed the action
-    $userSubjectKey = $action === 'joined' ? 'mail.you_joined_group_subject' : 'mail.you_left_group_subject';
-    MailNotification::create([
-        'user_uuid' => $user->uuid,
-        'mail_type' => 'group_membership_confirmation',
-        'subject' => __($userSubjectKey, ['group_name' => $group->name], $language),
-        'message_content' => __('mail.you_' . $action . '_group_message', [], $language),
-        'language' => $language,
-        'mail_data' => [
-            'user_name' => $user->name,
-            'group_name' => $group->name,
-            'group_uuid' => $group->uuid,
-            'action' => $action,
-            'contribution_amount' => $group->contribution_amount,
-            'frequency' => $group->frequency,
-            'start_date' => $group->start_date->format('M d, Y')
-        ]
-    ]);
-    
-    // Notify only the group admin (creator) - skip if the user performing the action is the admin
-    if ($user->uuid !== $group->created_by) {
-        $admin = User::where('uuid', $group->created_by)->first();
-        if ($admin) {
-            $adminLanguage = $admin->preferred_language ?? 'en';
-            
-            MailNotification::create([
-                'user_uuid' => $admin->uuid,
-                'mail_type' => 'group_membership',
-                'subject' => __($subjectKey, ['group_name' => $group->name], $adminLanguage),
-                'message_content' => __('mail.member_' . $action . '_message', [], $adminLanguage),
-                'language' => $adminLanguage,
-                'mail_data' => [
-                    'action_user_name' => $user->name,
-                    'group_name' => $group->name,
-                    'group_uuid' => $group->uuid,
-                    'action' => $action
-                ]
-            ]);
+    public function queueGroupMembershipMail(User $user, Group $group, string $action): void
+    {
+        $language = $user->preferred_language ?? 'en';
+        $subjectKey = $action === 'joined' ? 'mail.member_joined_subject' : 'mail.member_left_subject';
+
+        // Send confirmation email to the user who performed the action
+        $userSubjectKey = $action === 'joined' ? 'mail.you_joined_group_subject' : 'mail.you_left_group_subject';
+        MailNotification::create([
+            'user_uuid' => $user->uuid,
+            'mail_type' => 'group_membership_confirmation',
+            'subject' => __($userSubjectKey, ['group_name' => $group->name], $language),
+            'message_content' => __('mail.you_' . $action . '_group_message', [], $language),
+            'language' => $language,
+            'mail_data' => [
+                'user_name' => $user->name,
+                'group_name' => $group->name,
+                'group_uuid' => $group->uuid,
+                'action' => $action,
+                'contribution_amount' => $group->contribution_amount,
+                'frequency' => $group->frequency,
+                'start_date' => $group->start_date->format('M d, Y')
+            ]
+        ]);
+
+        // Notify only the group admin (creator) - skip if the user performing the action is the admin
+        if ($user->uuid !== $group->created_by) {
+            $admin = User::where('uuid', $group->created_by)->first();
+            if ($admin) {
+                $adminLanguage = $admin->preferred_language ?? 'en';
+
+                MailNotification::create([
+                    'user_uuid' => $admin->uuid,
+                    'mail_type' => 'group_membership',
+                    'subject' => __($subjectKey, ['group_name' => $group->name], $adminLanguage),
+                    'message_content' => __('mail.member_' . $action . '_message', [], $adminLanguage),
+                    'language' => $adminLanguage,
+                    'mail_data' => [
+                        'action_user_name' => $user->name,
+                        'group_name' => $group->name,
+                        'group_uuid' => $group->uuid,
+                        'action' => $action
+                    ]
+                ]);
+            }
         }
     }
-}
+
+    
+    public function queuePaymentSuccessMail(User $user, Group $group, $contribution): void
+    {
+        $language = $user->preferred_language ?? 'en';
+
+        MailNotification::create([
+            'user_uuid' => $user->uuid,
+            'mail_type' => 'payment_success',
+            'subject' => __('mail.payment_success_subject', ['group_name' => $group->name], $language),
+            'message_content' => __('mail.payment_success_message', ['group_name' => $group->name], $language),
+            'language' => $language,
+            'mail_data' => [
+                'user_name' => $user->name,
+                'group_name' => $group->name,
+                'group_uuid' => $group->uuid,
+                'contribution_amount' => $contribution->amount,
+                'payment_method' => $contribution->payment_method,
+                'transaction_id' => $contribution->transactionId,
+                'payment_date' => $contribution->updated_at->format('M d, Y H:i')
+            ]
+        ]);
+    }
+
+    public function queueWithdrawalRequestMail(User $user, Group $group, $withdrawalRequest): void
+    {
+        $language = $user->preferred_language ?? 'en';
+
+        MailNotification::create([
+            'user_uuid' => $user->uuid,
+            'mail_type' => 'withdrawal_request',
+            'subject' => __('mail.withdrawal_request_subject', ['group_name' => $group->name], $language),
+            'message_content' => __('mail.withdrawal_request_message', ['group_name' => $group->name], $language),
+            'language' => $language,
+            'mail_data' => [
+                'user_name' => $user->name,
+                'group_name' => $group->name,
+                'group_uuid' => $group->uuid,
+                'gross_amount' => $withdrawalRequest->gross_amount,
+                'service_charge' => $withdrawalRequest->service_charge,
+                'net_amount' => $withdrawalRequest->net_amount,
+                'bank_name' => $withdrawalRequest->bank_name,
+                'account_number' => $withdrawalRequest->account_number,
+                'account_name' => $withdrawalRequest->account_name
+            ]
+        ]);
+    }
 
     public function queueContributionStartedMails(Group $group): void
     {
         $group->members()->with('user')->each(function ($member) use ($group) {
             $user = $member->user;
             $language = $user->preferred_language ?? 'en';
-            
+
             // Calculate user's turn information
             $userTurnInfo = $this->calculateUserTurnInfo($group, $member);
-            
+
             MailNotification::create([
                 'user_uuid' => $user->uuid,
                 'mail_type' => 'contribution_started',
@@ -130,15 +177,15 @@ class NotificationService
         // This should match your existing logic for calculating turn dates
         $position = $member->payout_position ?? 1;
         $startDate = $group->start_date;
-        
+
         // Calculate turn date based on frequency and position
-        $turnDate = match($group->frequency) {
+        $turnDate = match ($group->frequency) {
             'daily' => $startDate->addDays($position - 1),
             'weekly' => $startDate->addWeeks($position - 1),
             'monthly' => $startDate->addMonths($position - 1),
             default => $startDate
         };
-        
+
         return [
             'position' => $position,
             'turn_date' => $turnDate->format('M d, Y'),

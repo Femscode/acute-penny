@@ -325,7 +325,8 @@ return [
     'signup_to_join_group' => 'Sign Up to Join Group',
     'random_turn_format' => 'Randomly Assigned Turn Format',
     'manual_turn_format' => 'Manually Assigned Turn Format',
-    'register' => 'Register'
+    'register' => 'Register',
+    'current_members' => 'Current Members'
 
 
 

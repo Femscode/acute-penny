@@ -46,7 +46,7 @@
                 <p>{{ __('mail.group_left_note', [], $language) }}</p>
             @endif
             
-            <p>{{ __('mail.thanks', [], $language) }}</p>
+            <!-- <p>{{ __('mail.thanks', [], $language) }}</p> -->
         </div>
     </div>
 </body>

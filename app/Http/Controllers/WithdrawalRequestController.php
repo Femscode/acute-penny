@@ -69,7 +69,7 @@ class WithdrawalRequestController extends Controller
         $netAmount = WithdrawalRequest::calculateNetAmount($payoutAmount);
 
         // Create withdrawal request
-        WithdrawalRequest::create([
+        $withdrawalRequest = WithdrawalRequest::create([
             'user_uuid' => $user->uuid,
             'group_uuid' => $group->uuid,
             'gross_amount' => $payoutAmount,
@@ -81,6 +81,8 @@ class WithdrawalRequestController extends Controller
             'notes' => $request->notes
         ]);
 
+         $notificationService = app(\App\Services\NotificationService::class);
+        $notificationService->queueWithdrawalRequestMail($user, $group, $withdrawalRequest);
         return redirect()->route('groups.show', $group)
             ->with('success', 'Withdrawal request submitted successfully! You will receive ₦' . number_format($netAmount, 2) . ' after processing.');
     }
