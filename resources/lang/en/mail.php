@@ -35,4 +35,9 @@ return [
     'important_reminder' => 'Important Reminder',
     'payment_reminder' => 'Please ensure you make your contributions on time according to the group schedule.',
     'prompt_payment_advice' => 'Prompt payments help maintain trust and ensure everyone receives their payout as scheduled.',
+    // User confirmation emails
+'you_joined_group_subject' => 'Welcome to :group_name!',
+'you_left_group_subject' => 'You have left :group_name',
+'you_joined_group_message' => 'You have successfully joined the group.',
+'you_left_group_message' => 'You have successfully left the group.',
 ];

@@ -26,7 +26,7 @@ class NotificationService
         ]);
     }
 
-    public function queueGroupMembershipMail(User $user, Group $group, string $action): void
+    public function oldqueueGroupMembershipMail(User $user, Group $group, string $action): void
     {
         $language = $user->preferred_language ?? 'en';
         $subjectKey = $action === 'joined' ? 'mail.member_joined_subject' : 'mail.member_left_subject';
@@ -50,6 +50,53 @@ class NotificationService
             ]);
         });
     }
+
+  public function queueGroupMembershipMail(User $user, Group $group, string $action): void
+{
+    $language = $user->preferred_language ?? 'en';
+    $subjectKey = $action === 'joined' ? 'mail.member_joined_subject' : 'mail.member_left_subject';
+    
+    // Send confirmation email to the user who performed the action
+    $userSubjectKey = $action === 'joined' ? 'mail.you_joined_group_subject' : 'mail.you_left_group_subject';
+    MailNotification::create([
+        'user_uuid' => $user->uuid,
+        'mail_type' => 'group_membership_confirmation',
+        'subject' => __($userSubjectKey, ['group_name' => $group->name], $language),
+        'message_content' => __('mail.you_' . $action . '_group_message', [], $language),
+        'language' => $language,
+        'mail_data' => [
+            'user_name' => $user->name,
+            'group_name' => $group->name,
+            'group_uuid' => $group->uuid,
+            'action' => $action,
+            'contribution_amount' => $group->contribution_amount,
+            'frequency' => $group->frequency,
+            'start_date' => $group->start_date->format('M d, Y')
+        ]
+    ]);
+    
+    // Notify only the group admin (creator) - skip if the user performing the action is the admin
+    if ($user->uuid !== $group->created_by) {
+        $admin = User::where('uuid', $group->created_by)->first();
+        if ($admin) {
+            $adminLanguage = $admin->preferred_language ?? 'en';
+            
+            MailNotification::create([
+                'user_uuid' => $admin->uuid,
+                'mail_type' => 'group_membership',
+                'subject' => __($subjectKey, ['group_name' => $group->name], $adminLanguage),
+                'message_content' => __('mail.member_' . $action . '_message', [], $adminLanguage),
+                'language' => $adminLanguage,
+                'mail_data' => [
+                    'action_user_name' => $user->name,
+                    'group_name' => $group->name,
+                    'group_uuid' => $group->uuid,
+                    'action' => $action
+                ]
+            ]);
+        }
+    }
+}
 
     public function queueContributionStartedMails(Group $group): void
     {
