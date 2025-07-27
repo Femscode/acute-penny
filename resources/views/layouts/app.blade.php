@@ -7,11 +7,16 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @if(isset($show_info) && $show_info)
     <meta name="title" content="Become part of our savings circle">
-    <meta name="description" content="Join {{ $group->title }} to save together and get paid in turn.">
+    <meta name="description" content="Become part of our savings circle">
+    <meta name="keywords" content="Join {{ $group->title }} to save together and get paid in turn.">
+    <meta property="og:title" content="Join {{ $group->title }} to save together and get paid in turn." />
     @else
     <meta name="title" content="Discover Syncosave">
-    <meta name="description" content="Join hands with the ones you love, friends, and family to grow financially.">
+    <meta name="description" content="Discover Syncosave">
+    <meta name="keywords" content="Join hands with the ones you love, friends, and family to grow financially.">
+    <meta property="og:title" content="Join hands with the ones you love, friends, and family to grow financially.">
     @endif
+    <meta property="og:image" content="https://syncosave.com/logo.png" />
     <!-- <title>{{ config('app.name', 'Syno-Save') }}</title> -->
 
     <!-- Fonts -->
