@@ -35,13 +35,21 @@ return [
     'important_reminder' => 'Important Reminder',
     'payment_reminder' => 'Please ensure you make your contributions on time according to the group schedule.',
     'prompt_payment_advice' => 'Prompt payments help maintain trust and ensure everyone receives their payout as scheduled.',
+    
     // User confirmation emails
-'you_joined_group_subject' => 'Welcome to :group_name!',
-'you_left_group_subject' => 'You have left :group_name',
-'you_joined_group_message' => 'You have successfully joined the group.',
-'you_left_group_message' => 'You have successfully left the group.',
-// Add these to your existing mail.php file
-'group_membership_title' => 'Group Membership Update',
-'group_left_note' => 'Thank you for being part of our community.',
-'view_group' => 'View Group',
+    'you_joined_group_subject' => 'Welcome to :group_name!',
+    'you_left_group_subject' => 'You have left :group_name',
+    'you_joined_group_message' => 'You have successfully joined the group.',
+    'you_left_group_message' => 'You have successfully left the group.',
+    'group_membership_title' => 'Group Membership Update',
+    'group_left_note' => 'Thank you for being part of our community.',
+    'view_group' => 'View Group',
+    
+    // Missing strings that the email template needs
+    'greeting' => 'Hello :name!',
+    'group_name' => 'Group Name',
+    'contribution_amount' => 'Contribution Amount',
+    'frequency' => 'Frequency',
+    'start_date' => 'Start Date',
+    'thanks' => 'Thank you!',
 ];
