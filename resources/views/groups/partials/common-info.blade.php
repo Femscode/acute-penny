@@ -26,6 +26,7 @@
         </div>
     </div>
 
+    @if($isAuthenticated)
     @if($group->current_turn_user_uuid === Auth::user()->uuid)
     <!-- Payout Request Section -->
     <div class="mt-6 p-4 bg-gradient-to-r from-green-50 to-yellow-50 dark:from-green-900/20 dark:to-yellow-900/20 border border-green-200 dark:border-green-800 rounded-lg">
@@ -61,6 +62,7 @@
             @endif
         </div>
     </div>
+    @endif
     @endif
 </div>
 
