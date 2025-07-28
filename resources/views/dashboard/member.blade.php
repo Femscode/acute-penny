@@ -47,7 +47,7 @@
                             @if($payment->is_overdue) border-red-300 bg-red-50 dark:bg-red-900/20 dark:border-red-700
                             @elseif($payment->is_due_today) border-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 dark:border-yellow-700
                             @else border-blue-300 bg-blue-50 dark:bg-blue-900/20 dark:border-blue-700 @endif">
-                            
+
                             <div class="flex-1">
                                 <div class="flex items-center space-x-3">
                                     <div class="p-2 rounded-full 
@@ -55,42 +55,45 @@
                                         @elseif($payment->is_due_today) bg-yellow-100 dark:bg-yellow-900
                                         @else bg-blue-100 dark:bg-blue-900 @endif">
                                         <svg class="w-4 h-4 
-                                            @if($payment->is_overdue) text-red-600 dark:text-red-400
-                                            @elseif($payment->is_due_today) text-yellow-600 dark:text-yellow-400
-                                            @else text-blue-600 dark:text-blue-400 @endif" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+    @if($payment->is_overdue) text-red-600 dark:text-red-400
+    @elseif($payment->is_due_today) text-yellow-600 dark:text-yellow-400
+    @else text-blue-600 dark:text-blue-400 @endif"
+                                            fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M3 10h18M3 6h18M6 14h12a2 2 0 002-2V8a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z">
+                                            </path>
                                         </svg>
                                     </div>
                                     <div>
                                         <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ $payment->group->name }}</h4>
                                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                                            ₦{{ number_format($payment->amount, 2) }} • 
+                                            ₦{{ number_format($payment->amount, 2) }} •
                                             @if($payment->is_overdue)
-                                                <span class="text-red-600 dark:text-red-400 font-medium">{{ __('general.overdue') }} ({{ floor($payment->days_until_due) }} {{ __('general.days_ago') }})</span>
+                                            <span class="text-red-600 dark:text-red-400 font-medium">{{ __('general.overdue') }} ({{ floor($payment->days_until_due) }} {{ __('general.days_ago') }})</span>
                                             @elseif($payment->is_due_today)
-                                                <span class="text-yellow-600 dark:text-yellow-400 font-medium">{{ __('general.due_today') }}</span>
+                                            <span class="text-yellow-600 dark:text-yellow-400 font-medium">{{ __('general.due_today') }}</span>
                                             @else
-                                                <span class="text-blue-600 dark:text-blue-400">{{ __('general.due_in') }} {{ floor($payment->days_until_due) }} {{ __('general.days') }}</span>
+                                            <span class="text-blue-600 dark:text-blue-400">{{ __('general.due_in') }} {{ floor($payment->days_until_due) }} {{ __('general.days') }}</span>
                                             @endif
                                         </p>
                                         <p class="text-xs text-gray-500 dark:text-gray-400">{{ __('general.due_date') }}: {{ $payment->due_date->format('M d, Y') }}</p>
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="flex items-center space-x-2">
                                 @if($payment->is_overdue)
-                                    <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full">
-                                        {{ __('general.overdue') }}
-                                    </span>
+                                <span class="px-2 py-1 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-full">
+                                    {{ __('general.overdue') }}
+                                </span>
                                 @elseif($payment->is_due_today)
-                                    <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full">
-                                        {{ __('general.due_today') }}
-                                    </span>
+                                <span class="px-2 py-1 text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200 rounded-full">
+                                    {{ __('general.due_today') }}
+                                </span>
                                 @endif
-                                
-                                <button class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out" 
-                                        onclick="window.location.href='{{ route('groups.show', $payment->group->uuid) }}'">
+
+                                <button class="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out"
+                                    onclick="window.location.href='{{ route('groups.show', $payment->group->uuid) }}'">
                                     {{ __('general.make_payment') }}
                                 </button>
                             </div>
@@ -169,94 +172,94 @@
                 @endif
             </div>
 
-          
 
-@if($payoutEligibleGroups->count() > 0)
-<!-- Payout Eligible Groups -->
-<div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-    <div class="p-6">
-        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-           
-            {{ __('Payout Available') }}
-        </h3>
-        
-        <div class="space-y-4">
-            @foreach($payoutEligibleGroups as $group)
-            <div class="p-4 bg-gradient-to-r from-green-50 to-yellow-50 dark:from-green-900/20 dark:to-yellow-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <div class="flex-1">
-                        <h4 class="font-semibold text-green-900 dark:text-green-100">{{ $group->name }}</h4>
-                        <p class="text-sm text-green-700 dark:text-green-300 mt-1">
-                            It's your turn to receive payout! 
-                            <span class="font-semibold">₦{{ number_format($group->net_amount, 2) }}</span> 
-                            (after 5% service charge)
-                        </p>
-                        <div class="flex items-center text-xs text-green-600 dark:text-green-400 mt-2">
-                            <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
-                            </svg>
-                            {{ ucfirst($group->frequency) }} • {{ $group->current_members }} members
+
+            @if($payoutEligibleGroups->count() > 0)
+            <!-- Payout Eligible Groups -->
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+
+                        {{ __('Payout Available') }}
+                    </h3>
+
+                    <div class="space-y-4">
+                        @foreach($payoutEligibleGroups as $group)
+                        <div class="p-4 bg-gradient-to-r from-green-50 to-yellow-50 dark:from-green-900/20 dark:to-yellow-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <h4 class="font-semibold text-green-900 dark:text-green-100">{{ $group->name }}</h4>
+                                    <p class="text-sm text-green-700 dark:text-green-300 mt-1">
+                                        It's your turn to receive payout!
+                                        <span class="font-semibold">₦{{ number_format($group->net_amount, 2) }}</span>
+                                        (after 5% service charge)
+                                    </p>
+                                    <div class="flex items-center text-xs text-green-600 dark:text-green-400 mt-2">
+                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        {{ ucfirst($group->frequency) }} • {{ $group->current_members }} members
+                                    </div>
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-2">
+                                    <a href="{{ route('groups.show', $group) }}"
+                                        class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition duration-200 text-center">
+                                        View Group
+                                    </a>
+                                    <a href="{{ route('withdrawal-requests.create', $group) }}"
+                                        class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition duration-200 text-center">
+                                        Request Payout
+                                    </a>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-2">
-                        <a href="{{ route('groups.show', $group) }}" 
-                            class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition duration-200 text-center">
-                            View Group
-                        </a>
-                        <a href="{{ route('withdrawal-requests.create', $group) }}" 
-                            class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg transition duration-200 text-center">
-                            Request Payout
-                        </a>
+                        @endforeach
                     </div>
                 </div>
             </div>
-            @endforeach
-        </div>
-    </div>
-</div>
-@endif
+            @endif
 
-<!-- Add this section before the "My Groups" section -->
-@if($pendingGroups->count() > 0)
-<div class="bg-white rounded-lg shadow-md p-6 mb-6">
-    <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('general.pending_group_requests') }}</h2>
-    <div class="space-y-4">
-        @foreach($pendingGroups as $membership)
-            <div class="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <div>
-                    <h3 class="font-medium text-gray-900">{{ $membership->group->name }}</h3>
-                    <p class="text-sm text-gray-600">{{ __('general.request_pending_approval') }}</p>
+            <!-- Add this section before the "My Groups" section -->
+            @if($pendingGroups->count() > 0)
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-xl font-semibold text-gray-900 mb-4">{{ __('general.pending_group_requests') }}</h2>
+                <div class="space-y-4">
+                    @foreach($pendingGroups as $membership)
+                    <div class="flex items-center justify-between p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <div>
+                            <h3 class="font-medium text-gray-900">{{ $membership->group->name }}</h3>
+                            <p class="text-sm text-gray-600">{{ __('general.request_pending_approval') }}</p>
+                        </div>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full">
+                            {{ __('general.pending') }}
+                        </span>
+                    </div>
+                    @endforeach
                 </div>
-                <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-sm font-medium rounded-full">
-                    {{ __('general.pending') }}
-                </span>
             </div>
-        @endforeach
-    </div>
-</div>
-@endif
+            @endif
 
             <!-- My Groups Section -->
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6">
                     <div class="flex justify-between items-center mb-4">
-    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('general.my_groups') }}</h3>
-    <div class="flex space-x-4">
-        <a href="{{ route('groups.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
-            {{ __('general.view_all') }}
-        </a>
-        <a href="{{ route('groups.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-orange hover:bg-brand-orange-900 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
-            {{ __('general.create_group') }}
-        </a>
-    </div>
-</div>
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">{{ __('general.my_groups') }}</h3>
+                        <div class="flex space-x-4">
+                            <a href="{{ route('groups.index') }}" class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
+                                {{ __('general.view_all') }}
+                            </a>
+                            <a href="{{ route('groups.create') }}" class="inline-flex items-center px-4 py-2 bg-brand-orange hover:bg-brand-orange-900 text-white text-sm font-medium rounded-md transition duration-150 ease-in-out">
+                                {{ __('general.create_group') }}
+                            </a>
+                        </div>
+                    </div>
 
                     @if($userGroups->count() > 0 || $createdGroups->count() > 0)
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         @foreach($userGroups->take(3) as $group)
                         <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition relative">
                             <!-- Open button at top right -->
-                  
+
 
                             <h4 class="font-semibold text-gray-900 dark:text-gray-100 mb-2 pr-16">{{ $group->name }}</h4>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">₦{{ number_format($group->contribution_amount, 2) }} {{ $group->frequency }}</p>
@@ -295,8 +298,10 @@
                         @foreach($recentActivity['contributions'] as $contribution)
                         <div class="flex items-center space-x-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                             <div class="p-2 bg-green-100 dark:bg-green-900 rounded-full">
-                                <svg class="w-4 h-4 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 10h18M3 6h18M6 14h12a2 2 0 002-2V8a2 2 0 00-2-2H6a2 2 0 00-2 2v4a2 2 0 002 2z">
+                                    </path>
                                 </svg>
                             </div>
                             <div class="flex-1">
