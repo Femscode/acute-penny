@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Services\AlatPayService;
 use App\Models\Contribution;
 use App\Models\Group;
+use App\Services\AlatPayService;
+use App\Services\ContributionService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use Exception;
 
 class PaymentController extends Controller
 {
@@ -296,5 +297,26 @@ class PaymentController extends Controller
             \Log::error('ALATPay Callback Error: ' . $e->getMessage());
             return response()->json(['message' => 'Callback processing failed'], 500);
         }
+    }
+
+    public function showPaymentOptionsForCycle(Group $group, int $cycle)
+    {
+        $user = Auth::user();
+
+        // Check if user is a member
+        if (!$group->members()->where('user_uuid', $user->uuid)->exists()) {
+            return redirect()->route('groups.show', $group)
+                ->with('error', 'You are not a member of this group.');
+        }
+
+        $contributionService = app(ContributionService::class);
+        $contribution = $contributionService->createFutureCycleContribution($group, $user, $cycle);
+
+        if (!$contribution) {
+            return redirect()->route('groups.show', $group)
+                ->with('error', 'Unable to create contribution for this cycle.');
+        }
+
+        return view('payments.options', compact('contribution', 'group'));
     }
 }

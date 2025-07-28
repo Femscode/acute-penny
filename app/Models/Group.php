@@ -145,7 +145,7 @@ class Group extends Model
     {
         return $this->privacy_type === 'public';
     }
- 
+
     /**
      * Check if a user has paid their contribution for the current cycle
      */
@@ -157,22 +157,24 @@ class Group extends Model
 
         // Get the current cycle's due date
         $currentCycleDueDate = $this->getNextContributionDate();
-        
+
         if (!$currentCycleDueDate) {
             return false;
         }
 
-      
-        $contri = Contribution::where('group_uuid',$this->uuid);
-       
+
+        $contri = Contribution::where('group_uuid', $this->uuid);
+
         // Check if user has a paid contribution for the current cycle
         return $contri
             ->where('user_uuid', $userUuid)
             // ->where('due_date','>=', $currentCycleDueDate->toDateString())
-              ->where('cycle', $this->current_cycle)
+            ->where('cycle', $this->current_cycle)
             ->where('status', 'paid')
             ->exists();
     }
+
+
 
     /**
      * Get user's contribution status for current cycle
@@ -184,19 +186,37 @@ class Group extends Model
         }
 
         $currentCycleDueDate = $this->getNextContributionDate();
-        
+
         if (!$currentCycleDueDate) {
             return null;
         }
 
-         $contri = Contribution::where('group_uuid',$this->uuid);
+        $contri = Contribution::where('group_uuid', $this->uuid);
         return $contri
             ->where('user_uuid', $userUuid)
-              ->where('cycle', $this->current_cycle)
+            ->where('cycle', $this->current_cycle)
             // ->where('due_date', '>=', $currentCycleDueDate->toDateString())
             ->first();
     }
 
-  
+    public function hasUserPaidForCycle(User $user, int $cycle): bool
+{
+    return $this->contributions()
+        ->where('user_uuid', $user->uuid)
+        ->where('cycle', $cycle)
+        ->where('status', 'paid')
+        ->exists();
+}
+    public function getUserContributionForCycle(User $user, int $cycle): ?Contribution
+    {
+        return $this->contributions()
+            ->where('user_uuid', $user->uuid)
+            ->where('cycle', $cycle)
+            ->first();
+    }
 
+    public function getMaxPayableCycle(): int
+    {
+        return $this->current_cycle + 2;
+    }
 }

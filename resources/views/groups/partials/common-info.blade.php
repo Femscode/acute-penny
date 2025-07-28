@@ -73,7 +73,7 @@ $userContribution = $group->getUserCurrentCycleContribution(Auth::user()->uuid);
 
 @if($userHasPaid)
 <!-- Payment Completed Section -->
-<div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
+<!-- <div class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 mb-6">
     <div class="flex items-center mb-3">
         <svg class="w-6 h-6 text-green-600 dark:text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
@@ -110,7 +110,44 @@ $userContribution = $group->getUserCurrentCycleContribution(Auth::user()->uuid);
             {{ __('general.payment_completed_message') }}
         </p>
     </div>
-</div>
+</div> -->
+
+@if($userIsMember)
+    <div class="mt-6">
+       
+        
+        @for($cycle = $group->current_cycle; $cycle < $group->getMaxPayableCycle(); $cycle++)
+            @php
+                $userContribution = $group->getUserContributionForCycle(auth()->user(), $cycle);
+                $hasPaid = $group->hasUserPaidForCycle(auth()->user(), $cycle);
+            @endphp
+            
+            <div class="mb-3 p-4 border rounded-lg {{ $hasPaid ? 'bg-green-50 border-green-200' : 'bg-gray-50 border-gray-200' }}">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <span class="font-medium">Cycle {{ $cycle }}</span>
+                        @if($cycle == $group->current_cycle)
+                            <span class="ml-2 px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">Current</span>
+                        @elseif($cycle > $group->current_cycle)
+                            <span class="ml-2 px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded">Future</span>
+                        @endif
+                        
+                        @if($hasPaid)
+                            <span class="ml-2 px-2 py-1 text-xs bg-green-100 text-green-800 rounded">✓ Paid</span>
+                        @endif
+                    </div>
+                    
+                    @if(!$hasPaid)
+                        <a href="{{ route('payments.options-cycle', ['group' => $group, 'cycle' => $cycle]) }}" 
+                           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            Pay ₦{{ number_format($group->contribution_amount, 2) }}
+                        </a>
+                    @endif
+                </div>
+            </div>
+        @endfor
+    </div>
+@endif
 @else
 <!-- Payment Options Section -->
 @if($group->currentTurnUser)

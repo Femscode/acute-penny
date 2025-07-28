@@ -89,6 +89,7 @@
                             @endif
                         </div>
 
+                        
                         @include('groups.partials.common-info')
                         @include('groups.partials.action-buttons')
                     </div>

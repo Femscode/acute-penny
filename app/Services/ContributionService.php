@@ -2,9 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Contribution;
 use App\Models\Group;
 use App\Models\GroupMember;
-use App\Models\Contribution;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -312,6 +313,7 @@ class ContributionService
         return false;
     }
 
+
     public function advanceToNextTurn(Group $group): void
     {
         $nextPosition = ($group->current_cycle % $group->current_members) + 1;
@@ -334,14 +336,62 @@ class ContributionService
         $dueDate = $this->calculateNextDueDate($group);
 
         foreach ($members as $member) {
-            Contribution::create([
-                'group_uuid' => $group->uuid,
-                'user_uuid' => $member->user_uuid,
-                'amount' => $group->contribution_amount,
-                'due_date' => $dueDate,
-                'cycle' => $group->current_cycle,
-                'status' => 'pending',
-            ]);
+            // Only create if contribution doesn't already exist
+            $existingContribution = $group->contributions()
+                ->where('user_uuid', $member->user_uuid)
+                ->where('cycle', $group->current_cycle)
+                ->first();
+
+            if (!$existingContribution) {
+                Contribution::create([
+                    'group_uuid' => $group->uuid,
+                    'user_uuid' => $member->user_uuid,
+                    'amount' => $group->contribution_amount,
+                    'due_date' => $dueDate,
+                    'cycle' => $group->current_cycle,
+                    'status' => 'pending',
+                ]);
+            }
+        }
+    }
+
+    public function createFutureCycleContribution(Group $group, User $user, int $targetCycle): ?Contribution
+    {
+        // Check if user already has a contribution for this cycle
+        $existingContribution = $group->contributions()
+            ->where('user_uuid', $user->uuid)
+            ->where('cycle', $targetCycle)
+            ->first();
+
+        if ($existingContribution) {
+            return $existingContribution;
+        }
+
+         // Create contribution for future cycle
+        return Contribution::create([
+            'group_uuid' => $group->uuid,
+            'user_uuid' => $user->uuid,
+            'amount' => $group->contribution_amount,
+            'due_date' => $this->calculateDueDateForCycle($group, $targetCycle),
+            'cycle' => $targetCycle,
+            'status' => 'pending',
+        ]);
+    }
+
+    private function calculateDueDateForCycle(Group $group, int $cycle): Carbon
+    {
+        $startDate = Carbon::parse($group->contribution_started_at);
+        $cycleOffset = $cycle - 1; // Since cycle 1 is the starting cycle
+
+        switch ($group->frequency) {
+            case 'daily':
+                return $startDate->addDays($cycleOffset);
+            case 'weekly':
+                return $startDate->addWeeks($cycleOffset);
+            case 'monthly':
+                return $startDate->addMonths($cycleOffset);
+            default:
+                return $startDate->addWeeks($cycleOffset);
         }
     }
 }

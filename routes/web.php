@@ -69,6 +69,7 @@ Route::middleware('auth')->group(function () {
 
     // Payment routes
     Route::get('/contributions/{contribution}/payment', [PaymentController::class, 'showPaymentOptions'])->name('payments.options');
+    Route::get('/groups/{group}/payment/cycle/{cycle}', [PaymentController::class, 'showPaymentOptionsForCycle'])->name('payments.options-cycle');
     Route::post('/contributions/{contribution}/payment/initialize-card', [PaymentController::class, 'initializeCardPayment'])->name('payments.initialize-card');
     Route::post('/contributions/{contribution}/payment/process-card', [PaymentController::class, 'processCardPayment'])->name('payments.process-card');
     Route::any('/contributions/{contribution}/payment/virtual-account', [PaymentController::class, 'generateVirtualAccount'])->name('payments.virtual-account');
