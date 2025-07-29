@@ -12,8 +12,8 @@
     @if(isset($show_info) && $show_info)
     <meta name="title" content="Become part of our savings circle">
     <meta name="description" content="Become part of our savings circle">
-    <meta name="keywords" content="Join {{ $group->title }} to save together and get paid in turn.">
-    <meta property="og:title" content="Join {{ $group->title }} to save together and get paid in turn." />
+    <meta name="keywords" content="Join {{ $group->name }} to save together and get paid in turn.">
+    <meta property="og:title" content="Join {{ $group->name }} to save together and get paid in turn." />
     @else
     <meta name="title" content="Discover Syncosave">
     <meta name="description" content="Discover Syncosave">
