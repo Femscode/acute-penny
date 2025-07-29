@@ -46,7 +46,7 @@ class GroupController extends Controller
             'privacy_type' => 'required|in:public,private',
             'requires_approval' => 'boolean',
             'max_members' => 'required|integer|min:2|max:50',
-            'start_date' => 'required|date|after:today',
+            'start_date' => 'required|date|after:yesterday',
         ]);
 
         $group = Group::create([
