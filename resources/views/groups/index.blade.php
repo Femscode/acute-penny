@@ -16,7 +16,7 @@
     </x-slot>
 
     <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
+        <div class="max-w-7xl px-4 mx-auto sm:px-6 lg:px-8 space-y-8">
 
             <!-- Groups I've Joined -->
             <div>

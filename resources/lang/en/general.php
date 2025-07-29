@@ -326,7 +326,9 @@ return [
     'random_turn_format' => 'Randomly Assigned Turn Format',
     'manual_turn_format' => 'Manually Assigned Turn Format',
     'register' => 'Register',
-    'current_members' => 'Current Members'
+    'current_members' => 'Current Members',
+    'no_groups_created' => 'No groups created',
+    'no_groups_created_desc' =>'You\'re yet to create a group'
 
 
 
