@@ -288,6 +288,7 @@ return [
     'transfer_instructions_details' => 'Transfer the exact amount to the account details below. Payment will be confirmed automatically.',
     'account_number' => 'Account Number',
     'bank_name' => 'Bank Name',
+    'account_name' => 'Account Name',
     'amount' => 'Amount',
     'expires_at' => 'Expires At',
     'payment_status' => 'Payment Status',

@@ -36,6 +36,8 @@
                             </div>
                             
                             <div class="p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('general.account_name') }}</label>
+                                <span class="text-lg font-bold text-gray-900 dark:text-gray-100">CTHOSTEL PRODUCTS AND SERVICES</span>
                                 <label class="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{{ __('general.bank_name') }}</label>
                                 <span class="text-lg font-bold text-gray-900 dark:text-gray-100">{{ ($virtualAccount['virtualBankCode']) == '035' ? "Wema Bank" : "--" }}</span>
                             </div>
