@@ -139,8 +139,6 @@ class AlatPayService
                 return $response->json();
             }
 
-            dd($response);
-
             throw new Exception('Failed to check transaction status: ' . $response->body());
         } catch (Exception $e) {
             Log::error('ALATPay Transaction Status Error: ' . $e->getMessage());
