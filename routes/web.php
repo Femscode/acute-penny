@@ -5,9 +5,11 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MailProcessingController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PaymentProcessingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WithdrawalRequestController;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -21,6 +23,9 @@ Route::get('/', function () {
 // Add this route for cron job mail processing
 Route::any('/process-mails', [MailProcessingController::class, 'processPendingMails'])
     ->name('mails.process');
+
+Route::any('/process-payments', [PaymentProcessingController::class, 'processPendingPayments'])
+    ->name('payments.process');
 
 Route::get('/language/{locale}', [App\Http\Controllers\LanguageController::class, 'changeLanguage'])
     ->name('language.change')
