@@ -139,7 +139,7 @@ class AlatPayService
                 return $response->json();
             }
 
-            date_default_timezone_set($response);
+            dd($response);
 
             throw new Exception('Failed to check transaction status: ' . $response->body());
         } catch (Exception $e) {
