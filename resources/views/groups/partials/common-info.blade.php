@@ -167,8 +167,8 @@ $userContribution = $group->getUserCurrentCycleContribution(Auth::user()->uuid);
             <h5 class="font-semibold text-orange-900 dark:text-orange-100 mb-2">ALATPay - {{ __('general.card_payment') }}</h5>
             <p class="text-sm text-orange-700 dark:text-orange-300 mb-3">{{ __('general.pay_securely_with_debit_card') }}</p>
          
-            <!-- <a disabled href="{{ route('alat.card.form', $group) }}" -->
-            <a disabled onclick="alert('{{ __('general.payment_option_not_available') }}')"
+            <a  href="{{ route('alat.card.form', $group) }}"
+            {{-- <!-- <a disabled onclick="alert('{{ __('general.payment_option_not_available') }}')" -->--}}
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium transition inline-block">
                 {{ __('general.pay_with_card') }}
             </a>
