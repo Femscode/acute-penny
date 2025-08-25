@@ -15,10 +15,21 @@
 </head>
 <body class="font-sans antialiased bg-gray-100 dark:bg-gray-900">
     <div class="min-h-screen flex">
+        <!-- Mobile menu overlay -->
+        <div id="mobile-menu-overlay" class="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden hidden"></div>
+        
         <!-- Sidebar -->
-        <div class="w-64 bg-white dark:bg-gray-800 shadow-lg">
+        <div id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white dark:bg-gray-800 shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0">
             <div class="p-6">
-                <h2 class="text-xl font-semibold text-gray-800 dark:text-white">{{ __('general.admin_panel') }}</h2>
+                <div class="flex items-center justify-between">
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white">{{ __('general.admin_panel') }}</h2>
+                    <!-- Close button for mobile -->
+                    <button id="close-sidebar" class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
             
             <nav class="mt-6">
@@ -85,12 +96,19 @@
         </div>
         
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col overflow-hidden">
+        <div class="flex-1 flex flex-col overflow-hidden lg:ml-0">
             <!-- Top Navigation -->
             <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
                 <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
                     <div class="flex justify-between items-center">
-                        <div>
+                        <div class="flex items-center">
+                            <!-- Mobile menu button -->
+                            <button id="mobile-menu-button" class="lg:hidden mr-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                                </svg>
+                            </button>
+                            
                             @isset($header)
                                 {{ $header }}
                             @endisset
@@ -133,7 +151,35 @@
             window.location.href = '{{ url("/set-locale") }}/' + locale + '?redirect=' + encodeURIComponent(window.location.href);
         }
         
+        // Mobile menu functionality
         $(document).ready(function() {
+            const sidebar = $('#sidebar');
+            const overlay = $('#mobile-menu-overlay');
+            const menuButton = $('#mobile-menu-button');
+            const closeButton = $('#close-sidebar');
+            
+            // Open mobile menu
+            menuButton.on('click', function() {
+                sidebar.removeClass('-translate-x-full');
+                overlay.removeClass('hidden');
+            });
+            
+            // Close mobile menu
+            function closeMobileMenu() {
+                sidebar.addClass('-translate-x-full');
+                overlay.addClass('hidden');
+            }
+            
+            closeButton.on('click', closeMobileMenu);
+            overlay.on('click', closeMobileMenu);
+            
+            // Close menu when clicking on navigation links (mobile only)
+            sidebar.find('a').on('click', function() {
+                if (window.innerWidth < 1024) {
+                    closeMobileMenu();
+                }
+            });
+            
             @if(session('success'))
                 Swal.fire({
                     icon: 'success',
