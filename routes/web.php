@@ -20,7 +20,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/create_next_round/{group}', [GroupController::class, 'createNextRound']);
+Route::get('/create_next_round/{group}', [GroupController::class, ' ']);
 
 // Add this route for cron job mail processing
 Route::any('/process-mails', [MailProcessingController::class, 'processPendingMails'])
@@ -90,6 +90,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // ALATPay webhook (no auth required)
+Route::post('/alatpay/webhook', [PaymentController::class, 'handleWebhook'])->name('payments.webhook');
 Route::post('/alatpay/callback', [PaymentController::class, 'handleCallback'])->name('payments.callback');
 
 Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');

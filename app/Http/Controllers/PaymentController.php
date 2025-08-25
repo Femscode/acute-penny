@@ -262,10 +262,177 @@ class PaymentController extends Controller
         }
     }
 
+        /**
+     * Handle ALATPay webhook for secure payment verification
+     */
+    public function handleWebhook(Request $request)
+    {
+        
+
+          file_put_contents(__DIR__ . '/alatlog.txt', json_encode($request->all(), JSON_PRETTY_PRINT), FILE_APPEND);
+
+
+        try {
+            // Validate webhook structure
+            $webhookData = $request->all();
+            
+            if (!isset($webhookData['Value']['Data'])) {
+                \Log::warning('Invalid webhook structure received', $webhookData);
+                return response()->json(['message' => 'Invalid webhook structure'], 400);
+            }
+
+            $data = $webhookData['Value']['Data'];
+            $status = $webhookData['Value']['Status'] ?? false;
+            $message = $webhookData['Value']['Message'] ?? '';
+
+            // Validate required fields
+            if (!isset($data['OrderId']) || !isset($data['Status'])) {
+                \Log::warning('Missing required fields in webhook', $data);
+                return response()->json(['message' => 'Missing required fields'], 400);
+            }
+
+            $orderId = $data['OrderId'];
+            $paymentStatus = strtolower($data['Status']);
+            $transactionId = $data['Customer']['TransactionId'] ?? null;
+            $amount = $data['Amount'] ?? 0;
+
+            // Find contribution by order ID
+            $contribution = Contribution::where('payment_reference', $orderId)->first();
+
+            if (!$contribution) {
+                \Log::warning('Contribution not found for webhook', [
+                    'order_id' => $orderId,
+                    'transaction_id' => $transactionId
+                ]);
+                return response()->json(['message' => 'Contribution not found'], 404);
+            }
+
+            // Verify amount matches (security check)
+            if ($amount != $contribution->amount) {
+                \Log::error('Amount mismatch in webhook', [
+                    'webhook_amount' => $amount,
+                    'contribution_amount' => $contribution->amount,
+                    'contribution_id' => $contribution->id
+                ]);
+                return response()->json(['message' => 'Amount mismatch'], 400);
+            }
+
+            // Process payment based on status
+            if ($status && ($paymentStatus === 'completed' || $paymentStatus === 'successful')) {
+                // Check if already processed to prevent duplicate processing
+                if ($contribution->status === 'paid') {
+                    \Log::info('Payment already processed', [
+                        'contribution_id' => $contribution->id,
+                        'order_id' => $orderId
+                    ]);
+                    return response()->json(['message' => 'Payment already processed'], 200);
+                }
+
+                // Update contribution with transaction details
+                $contribution->update([
+                    'transactionId' => $transactionId,
+                    'status' => 'paid',
+                    'paid_at' => now()
+                ]);
+
+                // Queue payment success notification
+                $notificationService = app(\App\Services\NotificationService::class);
+                $notificationService->queuePaymentSuccessMail(
+                    $contribution->user,
+                    $contribution->group,
+                    $contribution
+                );
+
+                \Log::info('Payment confirmed via webhook', [
+                    'contribution_id' => $contribution->id,
+                    'transaction_id' => $transactionId,
+                    'amount' => $amount,
+                    'order_id' => $orderId,
+                    'user_email' => $contribution->user->email
+                ]);
+
+                return response()->json(['message' => 'Payment processed successfully'], 200);
+            } 
+            elseif ($paymentStatus === 'failed' || $paymentStatus === 'cancelled') {
+                \Log::warning('Payment failed via webhook', [
+                    'contribution_id' => $contribution->id,
+                    'transaction_id' => $transactionId,
+                    'status' => $paymentStatus,
+                    'order_id' => $orderId
+                ]);
+
+                // Optionally update contribution status to failed
+                // $contribution->update(['status' => 'failed']);
+
+                return response()->json(['message' => 'Payment failed'], 200);
+            }
+            else {
+                \Log::info('Payment pending via webhook', [
+                    'contribution_id' => $contribution->id,
+                    'status' => $paymentStatus,
+                    'order_id' => $orderId
+                ]);
+
+                return response()->json(['message' => 'Payment status updated'], 200);
+            }
+
+        } catch (Exception $e) {
+            \Log::error('ALATPay Webhook Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request_data' => $request->all()
+            ]);
+            return response()->json(['message' => 'Webhook processing failed'], 500);
+        }
+    }
+
+    /**
+     * Handle ALATPay webhook/callback (Legacy method - kept for backward compatibility)
+     */
+    public function handleCallback(Request $request)
+    {
+        // Log the callback for debugging
+        \Log::info('ALATPay Callback (Legacy):', $request->all());
+
+        try {
+            $data = $request->all();
+
+            // Find contribution by order ID or transaction reference
+            $orderId = $data['orderId'] ?? $data['reference'] ?? null;
+
+            if (!$orderId) {
+                return response()->json(['message' => 'Order ID not found'], 400);
+            }
+
+            $contribution = Contribution::where('payment_reference', $orderId)->first();
+
+            if (!$contribution) {
+                return response()->json(['message' => 'Contribution not found'], 404);
+            }
+
+            // Check if payment was successful
+            $status = $data['status'] ?? '';
+            if (strtolower($status) === 'successful' || strtolower($status) === 'completed') {
+                $contribution->markAsPaid($contribution->payment_method);
+                
+                // Queue payment success notification
+                $notificationService = app(\App\Services\NotificationService::class);
+                $notificationService->queuePaymentSuccessMail(
+                    $contribution->user,
+                    $contribution->group,
+                    $contribution
+                );
+            }
+
+            return response()->json(['message' => 'Callback processed successfully']);
+        } catch (Exception $e) {
+            \Log::error('ALATPay Callback Error: ' . $e->getMessage());
+            return response()->json(['message' => 'Callback processing failed'], 500);
+        }
+    }
     /**
      * Handle ALATPay webhook/callback
      */
-    public function handleCallback(Request $request)
+    public function oldhandleCallback(Request $request)
     {
         // Log the callback for debugging
         \Log::info('ALATPay Callback:', $request->all());
