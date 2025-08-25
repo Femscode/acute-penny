@@ -90,7 +90,7 @@ Route::middleware('auth')->group(function () {
 });
 
 // ALATPay webhook (no auth required)
-Route::post('/alatpay/webhook', [PaymentController::class, 'handleWebhook'])->name('payments.webhook');
+Route::any('/alatpay/webhook', [PaymentController::class, 'handleWebhook'])->name('payments.webhook');
 Route::post('/alatpay/callback', [PaymentController::class, 'handleCallback'])->name('payments.callback');
 
 Route::get('/groups/{group}', [GroupController::class, 'show'])->name('groups.show');
