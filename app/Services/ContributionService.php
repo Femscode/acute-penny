@@ -330,7 +330,7 @@ class ContributionService
         }
     }
 
-    private function createNextRoundContributions(Group $group): void
+    public function createNextRoundContributions(Group $group): void
     {
         $members = $group->members()->get();
         $dueDate = $this->calculateNextDueDate($group);

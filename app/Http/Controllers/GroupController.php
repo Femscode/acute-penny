@@ -405,4 +405,9 @@ class GroupController extends Controller
 
         return back()->with('success', __('general.member_rejected_success'));
     }
+
+    public function createNextRound(Group $group) {
+        $this->contributionService->createNextRoundContributions($group);
+        return back()->with('success', __('general.next_round_contributions_created'));
+    }
 }
