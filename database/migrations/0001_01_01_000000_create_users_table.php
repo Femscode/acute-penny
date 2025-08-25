@@ -34,6 +34,7 @@ return new class extends Migration
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->longText('payload');
+              $table->boolean('is_admin')->default(false);
             $table->integer('last_activity')->index();
         });
     }

@@ -34,6 +34,7 @@ class User extends Authenticatable
         'address',
         'date_of_birth',
         'gender',
+        'is_admin'
     ];
 
     protected static function boot()
@@ -65,6 +66,12 @@ class User extends Authenticatable
     {
         return $this->getKey(); // This returns the primary key (id)
     }
+
+    public function isAdmin(): bool
+    {
+        return $this->is_admin;
+    }
+    
 
     public function contributions()
     {

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\LanguageController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\PaymentProcessingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\WithdrawalRequestController;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -87,6 +89,29 @@ Route::middleware('auth')->group(function () {
     Route::post('/alat/card/initialize', [PaymentController::class, 'initializeCardPayment'])->name('alat.card.initialize');
     Route::post('/alat/bank/generate', [PaymentController::class, 'generateVirtualAccount'])->name('alat.bank.generate');
     Route::get('/alat/card/form/{group}', [PaymentController::class, 'showCardForm'])->name('alat.card.form');
+});
+
+// ... existing code ...
+
+// Admin routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+    
+    // Groups management
+    Route::get('/groups', [AdminController::class, 'groups'])->name('groups.index');
+    Route::get('/groups/{group}', [AdminController::class, 'showGroup'])->name('groups.show');
+    
+    // Users management
+     Route::get('/users', [AdminController::class, 'users'])->name('users.index');
+    Route::get('/users/{user}/transactions', [AdminController::class, 'userTransactions'])->name('users.transactions');
+    Route::get('/users/{user}/withdrawals', [AdminController::class, 'userWithdrawals'])->name('users.withdrawals');
+    // Transactions management
+    Route::get('/transactions', [AdminController::class, 'transactions'])->name('transactions.index');
+    
+    // Withdrawal requests management
+    Route::get('/withdrawal-requests', [AdminController::class, 'withdrawalRequests'])->name('withdrawal-requests.index');
+    Route::patch('/withdrawal-requests/{withdrawalRequest}', [AdminController::class, 'updateWithdrawalRequest'])->name('withdrawal-requests.update');
+    
 });
 
 // ALATPay webhook (no auth required)
