@@ -29,7 +29,7 @@ class PaymentProcessingController extends Controller
         // Get contributions with pending payments that have transaction IDs
         $pendingPayments = Contribution::where('status', 'pending')
             ->whereNotNull('transactionId')
-            ->whereNotNull('payment_reference')
+            // ->whereNotNull('payment_reference')
             ->where('created_at', '>=', now()->subDays(7)) // Only check payments from last 7 days
             ->orderBy('created_at')
             ->limit(50) // Process 50 payments at a time
