@@ -22,7 +22,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/create_next_round/{group}', [GroupController::class, ' ']);
+Route::get('/create_next_round/{group}', [GroupController::class, 'createNextRound']);
 
 // Add this route for cron job mail processing
 Route::any('/process-mails', [MailProcessingController::class, 'processPendingMails'])
