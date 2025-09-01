@@ -342,6 +342,8 @@ class ContributionService
                 ->where('cycle', $group->current_cycle)
                 ->first();
 
+                dd($existingContribution, 'pel');
+
             if (!$existingContribution) {
                 Contribution::create([
                     'group_uuid' => $group->uuid,
